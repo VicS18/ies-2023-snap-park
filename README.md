@@ -16,8 +16,7 @@ Snap Park is an application that aims to provide parking lot owners and users mo
 https://uapt33090-my.sharepoint.com/:w:/g/personal/vitor_mtsantos_ua_pt/EVC90Zs7Yg9Hn26MMijkhGEBQuZp0UmTPTvXxaIweOdYlg?e=zxqqgN
 
 ### Development Repository
-
-https://github.com/VicS18/ies-2023-snap-park.git
+https://snappark.atlassian.net/jira/software/projects/SNAP/boards/1/backlog?epics=visible
 
 ### Project Backlog
 
