@@ -1,0 +1,540 @@
+"""Example client."""
+import asyncio
+import getpass
+import json
+import math
+import os
+from copy import deepcopy,copy
+
+from consts import Direction, Tiles, VITAL_SPACE, MIN_CORRIDOR_LEN ,MAX_LEN_ROPE, MIN_ENEMY_LIFE, GROUND_POINTS, MIDDLE_POINTS, BOTTOM_POINTS, BED_POINTS
+
+import networkx as nx
+import matplotlib.pyplot as plt
+
+MIN_ENEMY_LIFE = 3
+
+DEPTH = 4
+ACT_RANGE = 10
+dugDir=Direction.EAST
+dugRope=[]
+
+# Next 4 lines are not needed for AI agents, please remove them from your code!
+import pygame
+import websockets
+
+pygame.init()
+program_icon = pygame.image.load("data/icon2.png")
+pygame.display.set_icon(program_icon)
+
+
+class Map:   
+    def __init__(self,mapa,size):
+        self.map = mapa
+        self.hor_tiles = size[0]
+        self.ver_tiles = size[1]
+        
+    def dig(self, pos):
+        x, y = pos
+        if self.map[x][y] == Tiles.STONE:
+            self.map[x][y] = Tiles.PASSAGE
+
+    def is_blocked(self, pos, traverse):
+        x, y = pos
+        if x not in range(self.hor_tiles) or y not in range(self.ver_tiles):
+            return True
+        if self.map[x][y] == Tiles.PASSAGE:
+            return False
+        if self.map[x][y] == Tiles.STONE:
+            if traverse:
+                return False
+            else:
+                return True
+        if self.map[x][y] == 2:
+            return True
+        
+
+    def calc_pos(self, cur, direction: Direction, traverse=True):
+        npos = cur
+        if direction == Direction.NORTH:
+            npos = cur[0], cur[1] - 1
+            if self.is_blocked(npos, traverse):
+                return cur , False, direction
+            return npos, True, direction
+        if direction == Direction.WEST:
+            npos = cur[0] - 1, cur[1]
+            if self.is_blocked(npos, traverse):
+                return cur, False, direction
+            return npos, True, direction
+        if direction == Direction.SOUTH:
+            npos = cur[0], cur[1] + 1
+            if self.is_blocked(npos, traverse):
+                return cur, False, direction
+            return npos, True, direction
+        if direction == Direction.EAST:
+            npos = cur[0] + 1, cur[1]
+            if self.is_blocked(npos, traverse):
+                return cur, False, direction
+            return npos, True, direction
+        return cur, True, direction
+
+class Character:
+    def __init__(self,pos,direction=Direction.EAST,play=True):
+        self._pos = pos
+        self._direction: Direction = direction
+        self._play = play
+        self._wallpass = True
+            
+    def open_pos(self, mapa):
+        return [
+                (pos , d)
+                for pos , valid, d in [
+                    mapa.calc_pos(self._pos, d, self._wallpass) for d in Direction
+                ]
+                if valid
+            ] + [ (self._pos , None) ]
+        
+    def actions(self, state,index):
+        return [(pos,d,index) for pos , d in self.open_pos(state[1])]
+        
+class Pooka(Character):
+    def __init__(self,pos,direction,play,lives=MIN_ENEMY_LIFE):
+        super().__init__(pos,direction,play)
+        self._lives = lives
+        
+    def actions(self, state,index):
+        if self._lives < MIN_ENEMY_LIFE:
+            return [(self._pos,None,index)]
+
+        return super().actions(state,index)
+        
+class Fygar(Character):
+    def __init__(self,pos,direction,play,lives=MIN_ENEMY_LIFE,fire=[]):
+        super().__init__(pos,direction,play)
+        self._fire = fire
+        self._wallpass = False
+        self._lives = lives
+        
+    def actions(self, state,index):
+        if self._lives < MIN_ENEMY_LIFE:
+            return [(self._pos,None,index,self._fire)]
+        characters, mapa, score = state
+        ret = []
+        for pos , d in self.open_pos(state[1]):
+            ret.append( (pos,d,index,[]) )
+            fire = []
+            if d == Direction.EAST or d == Direction.WEST:
+                fpos = pos 
+                for _ in range(3):
+                    fpos = mapa.calc_pos(fpos, self._direction , traverse=False)
+                    if fpos:
+                        fpos = fpos[0]
+                    if fpos not in self._fire and fpos != pos: 
+                        fire.append(fpos)
+                    else:
+                        break
+            if len(fire) > 0:
+                ret.append( (pos,d,index,fire) )
+        return ret
+        
+class DigDug(Character):
+    def __init__(self,pos,direction,play,rope=[]):
+        super().__init__(pos,direction,play)
+        self._rope = rope
+
+    def actions(self, state,index):
+        ret = [ (pos , d , index , []) for pos , d in self.open_pos(state[1]) ]
+        
+        if len(self._rope) > 0:
+            new_pos = state[1].calc_pos(self._rope[-1], self._direction, traverse=False)[0]
+        else:
+            new_pos = state[1].calc_pos(self._pos, self._direction, traverse=False)[0]
+        
+        if new_pos in self._rope:  # we hit a wall
+            self._rope = []
+        
+
+        rope = copy(self._rope)
+        rope.append(new_pos)
+        if len(rope) > MAX_LEN_ROPE:
+            self._rope.pop()
+
+        return [ (self._pos , 10 , index , rope) ] + ret
+         
+          
+def actions(state):
+    '''
+        state is ( characters , map , score )
+        keep digdug in index 0 of characters 
+        
+        in here see first character that has not played and return character.actions( state , index of character in characters )
+    '''
+    characters, mapa, score = state
+    for i,c in enumerate(characters):
+        if c._play:
+            return c.actions(state, i)
+    
+def result(state,action):
+    '''
+        action is ( new pos , direction or 10 for attack , index in characters , optional param for digdug is rope for Fygar is fire ) 
+        
+        in here we need to return the state after applying action
+        
+        optional but probably best way 
+            1. get character
+            
+            2. copy character array
+            
+            3. switch by type
+            
+            4. if type digdug
+
+                4.1 digdug with new pos , direction , False (play = False because we are playing) , rope if there is 
+                4.2 check if in enemy or fire if so pos = (1,1)
+                4.3 if rope check if rope hit enemy and if so decrease HP of enemy
+                    4.3.1 if HP == 0 KILL (remove from characters)
+                4.4 if not rope reset all enemy HP to MIN_ENEMY_LIFE
+                4.5 if direction and direction != 10 copy map and update map so that new pos is Tiles.PASSAGE
+                    
+            5. if type Pooka
+                5.1 Pooka with new pos , direction , False 
+                5.2 check if in digdug if so digdug pos = ( 1, 1)
+                
+            6. if type Fygar 
+                6.1 same thing as Pooka 
+                6.2 check if fire and if fire hit DigDug if yes digdug pos = (1,1)
+                
+            7. return new characters and map
+    '''
+    
+    _characters , mapa, score = copy(state)
+    characters=copy(_characters)
+    new_pos = action[0]
+    dir_atk = action[1] # May be attack
+
+    char = characters[action[2]]
+    
+    rope_fire = []
+    if len(action) == 4:
+        rope_fire = action[3]
+
+    if isinstance(char, DigDug):
+        nChar = deepcopy(char)
+        nChar._pos = new_pos
+        if not (dir_atk == 10 or dir_atk is None):
+            nChar._direction = dir_atk
+        nChar._play = False
+        if len(rope_fire) > 0 and action[1]==10: #TODO: check conditions
+            nChar._rope = rope_fire
+        elif action[1]==None and char._rope!=[]:
+            nChar._rope= char._rope
+        else:
+            nChar._rope= []
+        for i,c in enumerate(characters[1::]):
+            if c._pos in nChar._rope:
+                nC=deepcopy(characters[i+1])
+                nC._lives -= 1
+                characters[i+1]=nC
+        
+        # Reset enemy lives
+        if len(rope_fire) == 0:
+            for c in characters[1:]:
+                c._lives = MIN_ENEMY_LIFE
+
+        # Dig when in dirt
+        mapa.dig(nChar._pos)
+
+    elif isinstance(char, Pooka):
+        nChar= deepcopy(char)
+        nChar._pos = new_pos
+        nChar._direction = dir_atk
+        nChar._play = False
+
+        # Is DigDug in danger?
+        if nChar._pos == characters[0]._pos:
+            nDug=deepcopy(characters[0])
+            nDug._pos=(1,1)            
+            characters[0]=nDug
+            score -= 10000 # BAD !!!
+
+    elif isinstance(char, Fygar):
+        nChar= deepcopy(char)
+        nChar._pos = new_pos
+        nChar._direction = dir_atk
+        nChar._fire = rope_fire
+        nChar._play = False
+
+        # Is DigDug in danger?
+        if (rope_fire and characters[0]._pos in rope_fire) or nChar._pos == characters[0]._pos:
+            nDug=deepcopy(characters[0])
+            nDug._pos=(1,1)
+            characters[0]=nDug
+            score -= 10000 # BAD !!!
+
+    characters[action[2]]=nChar
+    if action[2] > 0 and nChar._lives == 0: 
+        score += calc_score(nC._pos, mapa.ver_tiles)
+        characters.remove( nChar )
+
+    # Reset play mark
+    if all(not c._play for c in characters):
+        for c in characters:
+            c._play = True
+    
+    return (characters, mapa, score)
+    
+def makeInitialState( msg1 , msg2 ):
+    '''
+        the servers sends on msg 1 the map 
+        and on msg2 the characters 
+
+        parse that into state = ( characters , map , score )
+        and return
+    '''
+    enemies = msg2.get("enemies")
+    
+    # Pre-allocate list
+    characters = [None]*(len(enemies or []) + 1) # Don't forget about DigDug
+    characters[0] = DigDug(pos=tuple(msg2.get("digdug")), direction=dugDir, play=True, rope=dugRope)
+    
+    play = True
+    # Initialize characters
+    for y, en in enumerate(enemies):
+        i = y+1 # Corresponding index in the real characters array
+        pos = en.get("pos")
+        d = en.get("dir")
+        if en.get("name") == "Pooka":
+            characters[i] = Pooka(tuple(pos), d, play)
+        elif en.get("name") == "Fygar":
+            characters[i] = Fygar(tuple(pos), d, play, fire=en.get("fire"))
+
+    mapa = Map(msg1.get("map"), msg1.get("size"))
+
+    score = msg2.get("score")
+
+    return (characters, mapa, score)
+
+def updateState(srv_state, mapa):
+    """
+        Translate server's given state into AI-interpretable state
+        
+        Analogous process to makeInitialState()
+
+        NOTE: Returns new state = (characters, map, score)
+    """
+    enemies = srv_state.get("enemies")
+    
+    # Pre-allocate list
+    # That little 'enemies or []' expression ensures we still have the length of SOMETHING if the enemies are gone
+    characters = [None]*(len(enemies or []) + 1) # Don't forget about DigDug
+    characters[0] = DigDug(pos=tuple(srv_state.get("digdug")), direction=dugDir, play=True,rope=dugRope) #TODO: check direction /rope situation
+    
+    play = True
+    # Initialize characters
+    for y, en in enumerate(enemies):
+        i = y+1 # Corresponding index in the real characters array
+        pos = en.get("pos")
+        d = en.get("dir")
+        if en.get("name") == "Pooka":
+            characters[i] = Pooka(tuple(pos), d, play)
+        elif en.get("name") == "Fygar":
+            fire = en["fire"] if en.get("fire") else []
+            characters[i] = Fygar(tuple(pos), d, play, fire=fire)
+
+    score = srv_state.get("score")
+
+    return (characters, mapa, score)
+
+def calc_score(pos, map_height):
+    _, y = pos
+    if y < map_height / 4:
+        return GROUND_POINTS
+    elif y < map_height / 2:
+        return MIDDLE_POINTS
+    elif y < map_height * 3 / 4:
+        return BOTTOM_POINTS
+    return BED_POINTS
+
+class verySmart:
+    def __init__(self, server_address="localhost:8000", agent_name="student") -> None:
+        self.agent_name=agent_name
+        self.server_address=server_address
+        self.websocket=websockets.connect(f"ws://{server_address}/player")
+        self.state=None
+        self.depth = DEPTH
+
+    def minMax(self, state, action, depth=0, alpha=-math.inf, beta=math.inf, act_range=ACT_RANGE):
+        #tabs = "\t"*depth
+        #fmt_state = ["%s:%s:%s:%s" % (type(c).__name__, c._pos, c._direction, c._play) for c in state[0]]
+        #print("%sminMax: STATE: %s:%s ||| ACTION: %s ||| DEPTH: %i" % (tabs, state[2], fmt_state, action, depth))
+        
+        if(depth==DEPTH):
+            #print(tabs + "RETVAL:",state[2] + self.heuristic(state))
+            return state[2] + self.heuristic(state) #return Score of found state + heuristic
+
+        if action[2]!=0: #Opponents turn. Minimize:
+            best_val = -math.inf
+
+            enemy = state[0][action[2]]
+            #print("----> ENEMY: %s , %s, %i" % (type(enemy).__name__, enemy._pos, enemy._lives))
+            digdug = state[0][0]
+
+            # This enemy lies outside the acceptable range
+            if abs(enemy._pos[0] - digdug._pos[0]) + abs(enemy._pos[1] - digdug._pos[1]) > act_range:
+                #print("ACT_RANGE")
+                return self.heuristic(state)
+            
+            for a in actions(state):
+                #print("STATE_ACTIONS:", actions(state))
+                min_max = self.minMax(result(state, a), a, depth+1, alpha, beta)
+                best_val = max(min_max, best_val)
+                beta = max(best_val, beta)
+                if alpha >= beta:
+                    break
+            #print(tabs + "RETVAL:",best_val)
+            return best_val
+        
+        # DigDug's turn
+        best_val = math.inf
+        for a in actions(state):
+            #print("---> ACTION:", a)
+            min_max = self.minMax(result(state, a), a, depth+1, alpha, beta)
+            best_val = min(min_max, best_val)
+            alpha = min(best_val, alpha)
+            if alpha >= beta:
+                break
+        #print(tabs + "RETVAL:", best_val)
+        return best_val
+   
+    def heuristic(self,state): # state is ( characters , map , score )
+        characters,mapa,score=state
+        digX,digY=characters[0]._pos
+
+        if len(characters) == 1:
+            return 0
+
+        minDist,i=min( (abs(digX-char._pos[0]) + abs(digY-char._pos[1]),i) for i,char in enumerate(characters[1:])) #calculate distance from digDug to closest enemy
+        return mapa.ver_tiles + mapa.hor_tiles - minDist
+        """
+        return calc_score(characters[i]._pos,mapa.ver_tiles) - minDist
+        """
+
+def action_key(action):
+    if not action:
+        return ""
+    pos, direction, idx, rope = action
+    if direction == Direction.NORTH:
+        return "w"
+    elif direction == Direction.EAST:
+        return "d"
+    elif direction == Direction.SOUTH:
+        return "s"
+    elif direction == Direction.WEST:
+        return "a"
+    elif direction == 10:
+        return "A"
+    return ""
+
+matr = [[0,0,1,1,1], [0,0,1,0,1], [0,0,1,0,1]]
+mapa = Map(matr, (len(matr), len(matr[0])))
+digfug = DigDug((0,0), direction=Direction.EAST, rope = [], play=True)
+fooka = Pooka((1,0), direction=Direction.EAST, play=True)
+# fooka2 = Pooka((1,3), direction=Direction.EAST, play=True)
+state = ([digfug, fooka], mapa, 0)
+
+ai_agent = verySmart()
+
+# penis_state = result( state, ( (0,0) , None , 0 , [] ) )
+
+this = []
+for a in actions(state):
+    this.append( (ai_agent.minMax(result(state,a), a, 0) , action_key(a)) )
+this.sort()
+print(this)
+
+exit()
+
+async def agent_loop(server_address="localhost:8000", agent_name="student"):
+    """Example client loop."""
+    async with websockets.connect(f"ws://{server_address}/player") as websocket:
+        # Receive information about static game properties
+        await websocket.send(json.dumps({"cmd": "join", "name": agent_name}))
+
+        # Next 3 lines are not needed for AI agent
+        SCREEN = pygame.display.set_mode((299, 123))
+        SPRITES = pygame.image.load("data/pad.png").convert_alpha()
+        SCREEN.blit(SPRITES, (0, 0))
+
+        msg1 = None
+        ai_agent = verySmart()
+        ai_agent.depth=DEPTH
+        ai_state = None
+
+        ITER_COUNT = 0
+        ITER_MAX = 1e2
+
+        while True: #and ITER_COUNT < ITER_MAX:
+            try:
+                #ITER_COUNT += 1
+                state = json.loads(
+                    await websocket.recv()
+                )  # receive game update, this must be called timely or your game will get out of sync with the server
+                if msg1 is None:
+                    msg1 = state
+                    continue
+                if state.get("step") and state["step"] == 1:
+                    ai_state = makeInitialState(msg1, state)
+                    continue
+                ai_state = updateState(state, ai_state[1])
+
+                temp = [-math.inf, None]
+
+                print(state)
+
+                print("AI_STATE: ")
+                for c in ai_state[0]:
+                    if isinstance(c, Fygar):
+                        print("%s:%s:%s:%s" % (type(c).__name__, c._pos, c._direction, c._fire))
+                    else:
+                        print("%s:%s:%s" % (type(c).__name__, c._pos, c._direction))
+
+                for a in actions(ai_state):
+                    #print("ACT:", a)
+                    res = result(ai_state, a)
+                    #print("RES_SCORE:", res[2])
+                    min_max = ai_agent.minMax(res, a, 0)
+                    #print(min_max)
+                    if temp[0] < min_max:
+                        temp[0] = min_max
+                        temp[1] = a
+                    
+                #coiso=([(ai_agent.minMax(result(ai_state,a), a, 0),a) for a in actions(ai_state)])
+                #temp = max(coiso,key=lambda a:a[0])
+                
+                global dugDir
+                global dugRope
+                dugDir=temp[1][1]
+                dugRope=temp[1][3]
+                print("BEST_ACT:", temp[1])
+                #print("MIN_MAX:", min_max)
+                key = action_key(temp[1])
+
+                #print("KEY:", key)
+
+                await websocket.send(
+                    json.dumps({"cmd": "key", "key": key})
+                )  # send key command to server - you must implement this send in the AI agent
+
+            except websockets.exceptions.ConnectionClosedOK:
+                print("Server has cleanly disconnected us")
+                return
+
+
+
+# DO NOT CHANGE THE LINES BELLOW
+# You can change the default values using the command line, example:
+# $ NAME='arrumador' python3 client.py
+loop = asyncio.get_event_loop()
+SERVER = os.environ.get("SERVER", "localhost")
+PORT = os.environ.get("PORT", "8000")
+NAME = os.environ.get("NAME", getpass.getuser())
+loop.run_until_complete(agent_loop(f"{SERVER}:{PORT}", NAME))
