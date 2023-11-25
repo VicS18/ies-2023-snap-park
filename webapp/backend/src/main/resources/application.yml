@@ -1,0 +1,5 @@
+datasource:
+  url: jdbc:postgresql://{globalhost}:{port}/{cluster_name}.roach_data?sslmode=verify-full&sslrootcert={path to the CA certificate}/cc-ca.crt
+  username: root
+  password: snappark
+  driver-class-name: org.postgresql.Driver
