@@ -29,22 +29,19 @@ public class OccupancyHistory {
     @Column 
     private Boolean type;
 
+    @Column
+    private long date;
+
     @Embeddable
     @Getter
     @Setter
     @NoArgsConstructor
     @AllArgsConstructor
     public class OccupancyHistoryId{
-        @Id
         @ManyToOne
         @JoinColumn(name="park_id")
         private Park park;
 
-        @Id
-        @Column
-        private long date;
-
-        @Id
         @ManyToOne
         @JoinColumn(name="sensor_id")
         private Sensor sensor;

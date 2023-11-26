@@ -35,12 +35,10 @@ public class LightHistory {
     @NoArgsConstructor
     @AllArgsConstructor
     public class LightHistoryId{
-        @Id
         @ManyToOne
         @JoinColumn(name="park_id")
         private Park park;
 
-        @Id
         @OneToOne
         @JoinColumn(name="sensor_id")
         private Sensor sensor;

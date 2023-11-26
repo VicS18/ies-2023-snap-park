@@ -35,12 +35,10 @@ public class TemperatureHistory {
     @NoArgsConstructor
     @AllArgsConstructor
     public class TemperatureHistoryId{
-        @Id
         @ManyToOne
         @JoinColumn(name="park_id")
         private Park park;
 
-        @Id
         @OneToOne
         @JoinColumn(name="sensor_id")
         private Sensor sensor;

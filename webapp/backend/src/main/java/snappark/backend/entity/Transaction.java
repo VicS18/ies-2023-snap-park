@@ -6,6 +6,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,12 +23,14 @@ public class Transaction{
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Long id;
     
-    @OneToOne
-    @JoinColumn(name="event_id")
+    @ManyToOne
+    @JoinColumn(name = "entrance_park_id", referencedColumnName = "park_id")
+    @JoinColumn(name = "entrance_sensor_id", referencedColumnName = "sensor_id")
     private OccupancyHistory entrance;
 
-    @OneToOne
-    @JoinColumn(name="event_id")
+    @ManyToOne
+    @JoinColumn(name = "exit_park_id", referencedColumnName = "park_id")
+    @JoinColumn(name = "exit_sensor_id", referencedColumnName = "sensor_id")
     private OccupancyHistory exit;
 
     @Column

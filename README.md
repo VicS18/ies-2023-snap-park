@@ -49,6 +49,7 @@ docker run -d   \
     -v "roach-single:/cockroach/cockroach-data" \
     cockroachdb/cockroach:v23.1.12 start-single-node \
     --http-addr=localhost:8080 \
+    --insecure \
 ```
 
 5. Get useful startup details from the container's logs

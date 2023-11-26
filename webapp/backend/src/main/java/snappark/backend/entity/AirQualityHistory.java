@@ -36,17 +36,14 @@ public class AirQualityHistory {
     @AllArgsConstructor
     public class AirQualityHistoryId{
 
-        @Id
         @ManyToOne
         @JoinColumn(name="park_id")
         private Park park;
         
-        @Id
         @OneToOne
         @JoinColumn(name="sensor_id")
         private Sensor sensor;
 
-        @Id
         private Long id;
     }
 

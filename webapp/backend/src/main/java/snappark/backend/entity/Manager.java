@@ -27,12 +27,10 @@ public class Manager{
     @AllArgsConstructor
     @NoArgsConstructor
     public class ManagerId{
-        @Id
         @ManyToOne
         @JoinColumn(name="user_id")
         private User id;
 
-        @Id
         @ManyToOne
         @JoinColumn(name="park_id")
         private Park park;
