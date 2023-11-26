@@ -1,6 +1,8 @@
 package snappark.backend.entity;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
+import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -16,19 +18,9 @@ import lombok.Setter;
 @AllArgsConstructor
 @Entity
 public class OccupancyHistory {
-    @Id
-    @ManyToOne
-    @JoinColumn(name="park_id")
-    private Park park;
 
-    @Id
-    @Column
-    private long date;
-
-    @Id
-    @ManyToOne
-    @JoinColumn(name="sensor_id")
-    private Sensor sensor;
+    @EmbeddedId
+    private OccupancyHistoryId id;
 
     @ManyToOne
     @JoinColumn(name="user_id")
@@ -36,5 +28,26 @@ public class OccupancyHistory {
 
     @Column 
     private Boolean type;
+
+    @Embeddable
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public class OccupancyHistoryId{
+        @Id
+        @ManyToOne
+        @JoinColumn(name="park_id")
+        private Park park;
+
+        @Id
+        @Column
+        private long date;
+
+        @Id
+        @ManyToOne
+        @JoinColumn(name="sensor_id")
+        private Sensor sensor;
+    }
 
 }

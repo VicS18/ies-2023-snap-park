@@ -1,5 +1,7 @@
 package snappark.backend.entity;
 
+import jakarta.persistence.Embeddable;
+import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -15,14 +17,25 @@ import lombok.Setter;
 @AllArgsConstructor
 @Entity
 public class Manager{
-    @Id
-    @ManyToOne
-    @JoinColumn(name="user_id")
-    private User id;
 
-    @Id
-    @ManyToOne
-    @JoinColumn(name="park_id")
-    private Park park;
+    @EmbeddedId
+    private ManagerId id;
+
+    @Embeddable
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public class ManagerId{
+        @Id
+        @ManyToOne
+        @JoinColumn(name="user_id")
+        private User id;
+
+        @Id
+        @ManyToOne
+        @JoinColumn(name="park_id")
+        private Park park;
+    }
 
 }

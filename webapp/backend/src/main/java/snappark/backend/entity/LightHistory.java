@@ -1,6 +1,8 @@
 package snappark.backend.entity;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
+import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -17,20 +19,31 @@ import lombok.Setter;
 @AllArgsConstructor
 @Entity
 public class LightHistory {
-    @Id
-    @ManyToOne
-    @JoinColumn(name="park_id")
-    private Park park;
 
-    @Id
-    @OneToOne
-    @JoinColumn(name="sensor_id")
-    private Sensor sensor;
+    @EmbeddedId
+    private LightHistoryId id;
 
     @Column
     private int intensity;
 
     @Column
     private long date;
+
+    @Embeddable
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public class LightHistoryId{
+        @Id
+        @ManyToOne
+        @JoinColumn(name="park_id")
+        private Park park;
+
+        @Id
+        @OneToOne
+        @JoinColumn(name="sensor_id")
+        private Sensor sensor;
+    }
 
 }
