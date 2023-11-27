@@ -1,6 +1,7 @@
 package snappark.backend.entity;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -37,10 +38,23 @@ public class Manager{
     @JoinColumn(name="park_id")
     private Park park;
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Manager manager = (Manager) o;
+        return Objects.equals(id, manager.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
+
     @Embeddable
     @Getter
     @Setter
-    @EqualsAndHashCode
     @AllArgsConstructor
     @NoArgsConstructor
     public static class ManagerId implements Serializable{
@@ -51,6 +65,21 @@ public class Manager{
         @ManyToOne
         @JoinColumn(name="park_id")
         private Park parkId;
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            ManagerId managerId = (ManagerId) o;
+            return Objects.equals(userId, managerId.userId) &&
+                   Objects.equals(parkId, managerId.parkId);
+        }
+        
+        @Override
+        public int hashCode() {
+            return Objects.hash(userId, parkId);
+        }
+        
     }
 
 }

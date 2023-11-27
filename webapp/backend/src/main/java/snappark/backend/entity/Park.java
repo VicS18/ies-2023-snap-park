@@ -1,5 +1,6 @@
 package snappark.backend.entity;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import jakarta.persistence.Column;
@@ -40,5 +41,5 @@ public class Park {
     private float entranceFee;
 
     @OneToMany(mappedBy = "park")
-    private Set<Manager> managers;
+    private Set<Manager> managers = new HashSet<Manager>();
 }

@@ -3,9 +3,11 @@ package snappark.backend.service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import snappark.backend.entity.Manager;
 import snappark.backend.entity.Manager.ManagerId;
 import snappark.backend.entity.Park;
@@ -16,10 +18,14 @@ import snappark.backend.repository.UserRepository;
 
 @Service
 @AllArgsConstructor
+@NoArgsConstructor
 public class ParkServiceImpl implements ParkService {
 
+    @Autowired(required = true)
     private ParkRepository parkRepository;
+    @Autowired(required = true)
     private ManagerRepository managerRepository;
+    @Autowired(required = true)
     private UserRepository userRepository;
 
     //
