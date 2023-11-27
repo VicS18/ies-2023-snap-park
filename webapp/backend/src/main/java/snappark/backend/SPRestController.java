@@ -7,6 +7,7 @@ import snappark.backend.entity.Park;
 import snappark.backend.service.ParkService;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,6 +33,8 @@ public class SPRestController {
             retPark = parkService.getParkById(id);
         if(name != null)
             retPark = parkService.getParkByName(name);
+        if (retPark == null)
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST); 
         return new ResponseEntity<Park>(retPark, HttpStatus.CREATED);
     }
 
