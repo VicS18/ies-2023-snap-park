@@ -1,5 +1,6 @@
 package snappark.backend.entity;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import jakarta.persistence.Column;
@@ -10,6 +11,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -32,5 +34,5 @@ public class User {
     private String password;
 
     @OneToMany(mappedBy = "user")
-    private Set<Manager> managers;
+    private Set<Manager> managers = new HashSet<Manager>();
 }

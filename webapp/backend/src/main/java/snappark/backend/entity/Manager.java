@@ -2,6 +2,7 @@ package snappark.backend.entity;
 
 import java.io.Serializable;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.EmbeddedId;
@@ -10,6 +11,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -25,13 +27,12 @@ public class Manager{
     private ManagerId id;
 
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @MapsId("userId")
     @JoinColumn(name="user_id")
     private User user;
 
-
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @MapsId("parkId")
     @JoinColumn(name="park_id")
     private Park park;
@@ -39,6 +40,7 @@ public class Manager{
     @Embeddable
     @Getter
     @Setter
+    @EqualsAndHashCode
     @AllArgsConstructor
     @NoArgsConstructor
     public static class ManagerId implements Serializable{

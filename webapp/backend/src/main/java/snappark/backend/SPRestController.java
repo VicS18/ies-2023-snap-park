@@ -55,6 +55,7 @@ public class SPRestController {
     @PostMapping("/park/{userId}")
     public ResponseEntity<Park> postPark(@RequestBody Park park, @PathVariable Long userId){
         Park savedPark = parkService.createPark(park, userId);
+        System.out.println("======= PARK: " + savedPark);
         // TODO: Handle case where userId doesn't correspond to existing User (in Managers)
 
         return new ResponseEntity<Park>(savedPark, HttpStatus.CREATED);

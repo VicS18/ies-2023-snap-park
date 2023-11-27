@@ -37,10 +37,26 @@ public class ParkServiceImpl implements ParkService {
     // Shouldn't receive Park object argument
     public Park createPark(Park park, Long userId){        
         // TODO: Deal with situation where provided userId doesn't have a corresponding User
- 
+        
+        System.out.println("====== PARK: " + park);
+
         User user = userRepository.findUserById(userId);
-        Manager manager = new Manager(new ManagerId(user, park), user, park);
-        return managerRepository.save(manager).getPark();
+        System.out.println("========= USER: " + user);
+
+        Manager.ManagerId managerId = new Manager.ManagerId(user, park);
+
+        Manager manager = new Manager(managerId, user, park);
+        user.getManagers().add(manager);
+
+        System.out.println("ManagerId: " + manager.getId());
+        System.out.println("User: " + manager.getUser());
+        System.out.println("Park: " + manager.getPark());
+
+        System.out.println("======= MANAGER: " + manager);
+
+        Manager savedManager = managerRepository.save(manager);
+        System.out.println("=========== SAVED MANAGER: " + savedManager);
+        return savedManager.getPark();
     }
 
     //
