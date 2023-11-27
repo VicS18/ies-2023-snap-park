@@ -47,7 +47,7 @@ services:
     tty: true
     
   sveltekit:
-    build: ./frontend
+    build: ./frontend/snappark
     ports:
       - "5000:5000"
     networks:
