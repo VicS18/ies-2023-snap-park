@@ -41,7 +41,7 @@ public class Manager{
     @Setter
     @AllArgsConstructor
     @NoArgsConstructor
-    public class ManagerId implements Serializable{
+    public static class ManagerId implements Serializable{
         @ManyToOne
         @JoinColumn(name = "user_id")
          private User userId;

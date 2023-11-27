@@ -7,9 +7,12 @@ import org.springframework.stereotype.Service;
 
 import lombok.AllArgsConstructor;
 import snappark.backend.entity.Manager;
+import snappark.backend.entity.Manager.ManagerId;
 import snappark.backend.entity.Park;
+import snappark.backend.entity.User;
 import snappark.backend.repository.ManagerRepository;
 import snappark.backend.repository.ParkRepository;
+import snappark.backend.repository.UserRepository;
 
 @Service
 @AllArgsConstructor
@@ -17,6 +20,7 @@ public class ParkServiceImpl implements ParkService {
 
     private ParkRepository parkRepository;
     private ManagerRepository managerRepository;
+    private UserRepository userRepository;
 
     //
     // Park entity operations
@@ -31,8 +35,12 @@ public class ParkServiceImpl implements ParkService {
     }
 
     // Shouldn't receive Park object argument
-    public Park createPark(Park park){
-        return parkRepository.save(park);
+    public Park createPark(Park park, Long userId){        
+        // TODO: Deal with situation where provided userId doesn't have a corresponding User
+ 
+        User user = userRepository.findUserById(userId);
+        Manager manager = new Manager(new ManagerId(user, park), user, park);
+        return managerRepository.save(manager).getPark();
     }
 
     //
@@ -49,5 +57,7 @@ public class ParkServiceImpl implements ParkService {
     // User entity operations
     //
 
-    
+    public User createUser(User user){
+        return userRepository.save(user);
+    }
 }

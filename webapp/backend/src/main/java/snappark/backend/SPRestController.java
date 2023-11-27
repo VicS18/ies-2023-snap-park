@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import lombok.AllArgsConstructor;
 import snappark.backend.entity.Park;
+import snappark.backend.entity.User;
 import snappark.backend.service.ParkService;
 
 import java.util.List;
@@ -42,6 +43,7 @@ public class SPRestController {
 
     @GetMapping("/parks/{userId}")
     public ResponseEntity<List<Park>> getParksByUser(@PathVariable Long userId, @RequestParam(required = false) Long id, @RequestParam(required = false) String name){
+        // TODO: Handle case where userId isn't provided
         List<Park> retPark = parkService.getParksByUserId(id);
 
         if(id != null); // TODO: FILTER BY ID 
@@ -50,9 +52,21 @@ public class SPRestController {
         return new ResponseEntity<List<Park>>(retPark, HttpStatus.CREATED);
     } 
 
-    @PostMapping("/park")
-    public ResponseEntity<Park> postPark(@RequestBody Park park){
-        Park savedPark = parkService.createPark(park);
-        return new ResponseEntity<Park>(savedPark, HttpStatus.CREATED);   
+    @PostMapping("/park/{userId}")
+    public ResponseEntity<Park> postPark(@RequestBody Park park, @PathVariable Long userId){
+        Park savedPark = parkService.createPark(park, userId);
+        // TODO: Handle case where userId doesn't correspond to existing User (in Managers)
+
+        return new ResponseEntity<Park>(savedPark, HttpStatus.CREATED);
+    }
+
+    //
+    // User operations
+    //
+
+    @PostMapping("/user")
+    public ResponseEntity<User> postUser(@RequestBody User user){
+        User savedUser = parkService.createUser(user);
+        return new ResponseEntity<User>(savedUser, HttpStatus.CREATED);
     }
 }
