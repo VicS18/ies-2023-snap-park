@@ -7,7 +7,6 @@ import snappark.backend.entity.Park;
 import snappark.backend.service.ParkService;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,7 +26,7 @@ public class SPRestController {
     //
 
     @GetMapping("/park")
-    public ResponseEntity<Park> getPark(@RequestParam Long id, @RequestParam String name) {
+    public ResponseEntity<Park> getPark(@RequestParam(required = false) Long id, @RequestParam(required = false) String name) {
         Park retPark = null;
         if(id != null)
             retPark = parkService.getParkById(id);
@@ -42,11 +41,5 @@ public class SPRestController {
     public ResponseEntity<Park> postPark(@RequestBody Park park){
         Park savedPark = parkService.createPark(park);
         return new ResponseEntity<Park>(savedPark, HttpStatus.CREATED);   
-    }
-
-
-    @GetMapping("/greet/{name}")
-    public String greetWithName(@RequestParam String name) {
-        return "Hello, " + name + "!";
     }
 }
