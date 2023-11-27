@@ -45,6 +45,13 @@ services:
       - roachnet
     stdin_open: true
     tty: true
+    
+  sveltekit:
+    build: ./frontend
+    ports:
+      - "5000:5000"
+    networks:
+      - roachnet
 
 
 networks:
