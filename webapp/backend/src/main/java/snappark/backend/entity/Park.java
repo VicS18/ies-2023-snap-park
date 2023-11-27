@@ -1,10 +1,13 @@
 package snappark.backend.entity;
 
+import java.util.Set;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -35,5 +38,6 @@ public class Park {
     @Column(nullable = false)
     private float entranceFee;
 
-
+    @OneToMany(mappedBy = "park")
+    private Set<Manager> managers;
 }

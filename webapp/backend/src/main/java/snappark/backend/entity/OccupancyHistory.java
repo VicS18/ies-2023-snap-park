@@ -1,5 +1,7 @@
 package snappark.backend.entity;
 
+import java.io.Serializable;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.EmbeddedId;
@@ -37,7 +39,7 @@ public class OccupancyHistory {
     @Setter
     @NoArgsConstructor
     @AllArgsConstructor
-    public class OccupancyHistoryId{
+    public class OccupancyHistoryId implements Serializable{
         @ManyToOne
         @JoinColumn(name="park_id")
         private Park park;

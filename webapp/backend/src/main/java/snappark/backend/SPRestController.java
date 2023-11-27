@@ -6,9 +6,12 @@ import lombok.AllArgsConstructor;
 import snappark.backend.entity.Park;
 import snappark.backend.service.ParkService;
 
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,6 +39,16 @@ public class SPRestController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST); 
         return new ResponseEntity<Park>(retPark, HttpStatus.CREATED);
     }
+
+    @GetMapping("/parks/{userId}")
+    public ResponseEntity<List<Park>> getParksByUser(@PathVariable Long userId, @RequestParam(required = false) Long id, @RequestParam(required = false) String name){
+        List<Park> retPark = parkService.getParksByUserId(id);
+
+        if(id != null); // TODO: FILTER BY ID 
+        if(name != null); // TODO: FILTER BY NAME
+
+        return new ResponseEntity<List<Park>>(retPark, HttpStatus.CREATED);
+    } 
 
     @PostMapping("/park")
     public ResponseEntity<Park> postPark(@RequestBody Park park){

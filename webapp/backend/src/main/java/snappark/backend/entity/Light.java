@@ -1,5 +1,7 @@
 package snappark.backend.entity;
 
+import java.io.Serializable;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.EmbeddedId;
@@ -31,7 +33,7 @@ public class Light {
     @Setter
     @NoArgsConstructor
     @AllArgsConstructor
-    public class LightId{
+    public class LightId implements Serializable{
         @ManyToOne
         @JoinColumn(name="park_id")
         private Park park;
