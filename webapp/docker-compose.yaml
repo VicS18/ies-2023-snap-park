@@ -1,0 +1,55 @@
+version: "3.8"
+
+services:
+  rabbitmq:
+    image: "rabbitmq:3.8-management"
+    ports:
+      - "5671:5672"
+      - "15671:15672"
+    networks:
+      - roachnet
+
+  cockroachdb:
+    image: "cockroachdb/cockroach:v23.1.12"
+    command: start-single-node --http-addr=localhost:8080 --insecure
+    environment:
+      - COCKROACH_DATABASE=snap_park
+      - COCKROACH_USER=root
+      - COCKROACH_PASSWORD=snap_park
+    ports:
+      - "26257:26257"
+      - "8080:8080"
+    networks:
+      - roachnet
+    volumes:
+      - roach-single:/cockroach/cockroach-data
+  app:
+    depends_on:
+      - cockroachdb
+    build: ./backend
+    restart: on-failure
+    env_file: ./.env
+    ports:
+      - $SPRING_LOCAL_PORT:$SPRING_DOCKER_PORT
+    environment:
+      SPRING_APPLICATION_JSON: '{
+        "spring.datasource.url"  : "jdbc:postgresql://cockroachdb:26257/snap_park?sslmode=disable",
+        "spring.datasource.username" : "$COCKROACH_USER",
+        "spring.datasource.password" : "$COCKROACH_PASSWORD",
+        "spring.jpa.properties.hibernate.dialect" : "org.hibernate.dialect.PostgreSQLDialect",
+        "spring.jpa.hibernate.ddl-auto" : "update"
+      }'
+    volumes:
+      - .m2:/root/.m2
+    networks:
+      - roachnet
+    stdin_open: true
+    tty: true
+
+
+networks:
+  roachnet:
+    driver: bridge
+
+volumes:
+  roach-single:
