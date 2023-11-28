@@ -47,12 +47,14 @@ public class ParkServiceImpl implements ParkService {
         System.out.println("====== PARK: " + park);
 
         User user = userRepository.findUserById(userId);
+        Park savedPark = parkRepository.save(park);
         System.out.println("========= USER: " + user);
 
-        Manager.ManagerId managerId = new Manager.ManagerId(user, park);
+        Manager.ManagerId managerId = new Manager.ManagerId(user, savedPark);
 
-        Manager manager = new Manager(managerId, user, park);
+        Manager manager = new Manager(managerId, user, savedPark);
         user.getManagers().add(manager);
+        savedPark.getManagers().add(manager);
 
         System.out.println("ManagerId: " + manager.getId());
         System.out.println("User: " + manager.getUser());
