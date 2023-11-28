@@ -11,7 +11,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import snappark.backend.entity.Occupancy;
 import snappark.backend.entity.Park;
-import snappark.backend.entity.Occupancy.OccupancyId;
 
 @Service
 public class EventConsumer {
@@ -44,7 +43,6 @@ public class EventConsumer {
     private void trafficEvent(JsonNode json){
         Park p= park.getParkById(Long.valueOf(json.get("park").toString()));
         Occupancy o=new Occupancy();
-        OccupancyId oId=o.new OccupancyId(p);
         //TODO: finish        
 
     }

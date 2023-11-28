@@ -10,6 +10,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.PrimaryKeyJoinColumn;
 import jakarta.persistence.EmbeddedId;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -23,21 +24,16 @@ import lombok.Setter;
 @Entity
 public class Occupancy {
 
-    @EmbeddedId
-    private OccupancyId id;
+    @Id
+    @Column
+    private Long parkID;
 
     @Column
     private int lotation;
-    @Embeddable
-    @Getter
-    @Setter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public class OccupancyId implements Serializable {
-        
-        @OneToOne
-        @JoinColumn(name="park_id")
-        private Park park;
-    }
+
+    @OneToOne
+    @PrimaryKeyJoinColumn
+    private Park park;
+   
 }
     
