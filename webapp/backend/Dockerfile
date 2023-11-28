@@ -5,4 +5,4 @@ WORKDIR /backend
 COPY . .
 RUN mvn --fail-never clean install
 
-CMD mvn spring-boot:run
+CMD mvn spring-boot:run -Dspring-boot.run.jvmArguments="--add-opens java.base/java.lang=ALL-UNNAMED"
