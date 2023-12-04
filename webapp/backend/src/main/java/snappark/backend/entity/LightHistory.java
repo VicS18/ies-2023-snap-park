@@ -23,7 +23,7 @@ import lombok.Setter;
 public class LightHistory {
 
     @EmbeddedId
-    private LightHistoryId id;
+    private Long id;
 
     @Column
     private int intensity;
