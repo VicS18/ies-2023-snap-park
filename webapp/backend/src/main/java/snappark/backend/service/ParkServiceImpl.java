@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import snappark.backend.entity.Manager;
-import snappark.backend.entity.Manager.ManagerId;
 import snappark.backend.entity.Park;
 import snappark.backend.entity.User;
 import snappark.backend.repository.ManagerRepository;
@@ -45,18 +44,13 @@ public class ParkServiceImpl implements ParkService {
         // TODO: Deal with situation where provided userId doesn't have a corresponding User
         
         System.out.println("====== PARK: " + park);
+        Park savedPark = parkRepository.save(park);
+        System.out.println("====== SAVED PARK: " + savedPark);
 
         User user = userRepository.findUserById(userId);
         System.out.println("========= USER: " + user);
 
-        Manager.ManagerId managerId = new Manager.ManagerId(user, park);
-
-        Manager manager = new Manager(managerId, user, park);
-        user.getManagers().add(manager);
-
-        System.out.println("ManagerId: " + manager.getId());
-        System.out.println("User: " + manager.getUser());
-        System.out.println("Park: " + manager.getPark());
+        Manager manager = new Manager(user, savedPark);
 
         System.out.println("======= MANAGER: " + manager);
 

@@ -58,7 +58,8 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
-					<jvmArguments> --add-opens java.base/java.lang=ALL-UNNAMED </jvmArguments>
+					<!-- Debugging enabled -->
+					<jvmArguments> --add-opens java.base/java.lang=ALL-UNNAMED -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=8000 </jvmArguments>
 					<excludes>
 						<exclude>
 							<groupId>org.projectlombok</groupId>

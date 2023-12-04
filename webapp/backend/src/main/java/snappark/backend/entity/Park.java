@@ -14,16 +14,19 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(exclude = "managers")
+@ToString(exclude = "managers")
 @Entity
 public class Park {
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
-    private Long id;
+    Long id;
     
     @Column(unique = true, nullable = false)
     private String name;
@@ -41,5 +44,5 @@ public class Park {
     private float entranceFee;
 
     @OneToMany(mappedBy = "park")
-    private Set<Manager> managers = new HashSet<Manager>();
+    Set<Manager> managers = new HashSet<Manager>();
 }
