@@ -6,5 +6,5 @@ import snappark.backend.entity.Temperature;
 import snappark.backend.entity.Temperature.TemperatureId;;
 
 public interface TemperatureRepository extends JpaRepository<Temperature,TemperatureId>{
-    
+
 }
