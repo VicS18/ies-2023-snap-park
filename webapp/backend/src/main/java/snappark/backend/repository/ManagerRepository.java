@@ -12,4 +12,6 @@ import snappark.backend.entity.ManagerId;
 public interface ManagerRepository extends JpaRepository<Manager,ManagerId>{
 
     List<Manager> findByUserId(Long id);
+
+    List<Manager> findByUserName(String name);
 }

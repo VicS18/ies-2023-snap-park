@@ -9,9 +9,11 @@ import org.springframework.stereotype.Service;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import snappark.backend.entity.Manager;
+import snappark.backend.entity.OccupancyHistory;
 import snappark.backend.entity.Park;
 import snappark.backend.entity.User;
 import snappark.backend.repository.ManagerRepository;
+import snappark.backend.repository.OccupancyHistoryRepository;
 import snappark.backend.repository.ParkRepository;
 import snappark.backend.repository.UserRepository;
 
@@ -22,11 +24,15 @@ public class ParkServiceImpl implements ParkService {
 
     @Autowired(required = true)
     private ParkRepository parkRepository;
+
     @Autowired(required = true)
     private ManagerRepository managerRepository;
+
     @Autowired(required = true)
     private UserRepository userRepository;
 
+    @Autowired(required = true)
+    private OccupancyHistoryRepository occupancyHistoryRepository;
     //
     // Park entity operations
     // 
@@ -40,32 +46,38 @@ public class ParkServiceImpl implements ParkService {
     }
 
     // Shouldn't receive Park object argument
-    public Park createPark(Park park, Long userId){        
+    public Park createPark(Park park, String username){        
         // TODO: Deal with situation where provided userId doesn't have a corresponding User
         
-        System.out.println("====== PARK: " + park);
         Park savedPark = parkRepository.save(park);
-        System.out.println("====== SAVED PARK: " + savedPark);
 
-        User user = userRepository.findUserById(userId);
-        System.out.println("========= USER: " + user);
+        User user = userRepository.findUserByName(username);
 
         Manager manager = new Manager(user, savedPark);
 
-        System.out.println("======= MANAGER: " + manager);
-
         Manager savedManager = managerRepository.save(manager);
-        System.out.println("=========== SAVED MANAGER: " + savedManager);
         return savedManager.getPark();
+    }
+
+    public Park updatePark(Long parkId){
+        return parkRepository.findParkById(parkId);
+    }
+
+    public void deletePark(Long parkId){
+        parkRepository.deleteById(parkId);
     }
 
     //
     // Manager entity operations
     //
 
-    public List<Park> getParksByUserId(Long id){
-        List<Manager> managers = managerRepository.findByUserId(id);
+    public List<Park> getParksByUsername(String username){
+        List<Manager> managers = managerRepository.findByUserName(username);
         return managers.stream().map(Manager::getPark).collect(Collectors.toList());
+    }
+
+    public List<OccupancyHistory> getParkMovements(Long parkId){
+        return occupancyHistoryRepository.findById_ParkId(parkId);
     }
 
 

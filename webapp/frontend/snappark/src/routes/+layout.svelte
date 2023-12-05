@@ -33,7 +33,7 @@
 
     <!-- Nav Item - Pages Collapse Menu -->
     <li class="nav-item">
-        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true"
+        <a class="nav-link collapsed" href="#/" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true"
             aria-controls="collapseTwo">
             <i class="fas fa-fw fa-cog"></i>
             <span>Sensors</span>
@@ -41,26 +41,26 @@
         <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
             <div class="bg-white py-2 collapse-inner rounded">
                 <a class="collapse-item" href="sensors.html">View Sensors</a>
-                <a class="collapse-item" href="" data-toggle="modal" data-target="#addSensorModal">Add Sensor</a>
+                <a class="collapse-item" href="javascript:void(0)" data-toggle="modal" data-target="#addSensorModal">Add Sensor</a>
             </div>
         </div>
     </li>
 
     <!-- Nav Item - Utilities Collapse Menu -->
     <li class="nav-item">
-        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities"
+        <a class="nav-link collapsed" href="#/" data-toggle="collapse" data-target="#collapseUtilities"
             aria-expanded="true" aria-controls="collapseUtilities">
             <i class="fas fa-fw fa-wrench"></i>
             <span>Parks</span>
         </a>
         <div id="collapseUtilities" class="collapse" aria-labelledby="headingUtilities" data-parent="#accordionSidebar">
             <div class="bg-white py-2 collapse-inner rounded">
-                <a class="collapse-item" href="" data-toggle="modal" data-target="#addParkModal">Add Park</a>
+                <a class="collapse-item" href="javascript:void(0)" data-toggle="modal" data-target="#addParkModal">Add Park</a>
                 <h6 class="collapse-header">Parks:</h6>
                 <a class="collapse-item" href="park1.html">Park 1</a>
-                <a class="collapse-item" href="">Park 2</a>
-                <a class="collapse-item" href="">Park 3</a>
-                <a class="collapse-item" href="">Park 4</a>
+                <a class="collapse-item" href="javascript:void(0)">Park 2</a>
+                <a class="collapse-item" href="javascript:void(0)">Park 3</a>
+                <a class="collapse-item" href="javascript:void(0)">Park 4</a>
 
 
             </div>
@@ -83,7 +83,7 @@
         </a>
     </li>
     <li class="nav-item">
-        <a class="nav-link " href="#">
+        <a class="nav-link " href="#/">
             <i class="fas fa-fw fa-tag"></i>
 
             <span>Movement</span>
