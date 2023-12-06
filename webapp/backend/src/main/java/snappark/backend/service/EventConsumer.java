@@ -9,8 +9,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.transaction.Transactional;
+import snappark.backend.entity.AirQuality;
 import snappark.backend.entity.Light;
 import snappark.backend.entity.Occupancy;
+import snappark.backend.entity.Temperature;
 
 @Service
 public class EventConsumer {
@@ -54,17 +56,23 @@ public class EventConsumer {
     private void lightEvent(JsonNode json){
         Long parkID=Long.valueOf(json.get("park").toString());
         Long sensorID=Long.valueOf(json.get("sensor").toString());
-        Light newLight= new Light(null, 0); //TODO: finish 
-        park.updateLight(null);
+        Light newLight= new Light(Light.createLightId(park.getParkById(parkID), park.getSensorById(sensorID)), Integer.parseInt(json.get("intensity").toString())); 
+        park.updateLight(newLight);
     }
 
     @Transactional
     private void temperatureEvent(JsonNode json){
-        
+        Long parkID=Long.valueOf(json.get("park").toString());
+        Long sensorID=Long.valueOf(json.get("sensor").toString());
+        Temperature newTemperature= new Temperature(Temperature.createTemperatureId(park.getParkById(parkID), park.getSensorById(sensorID)), Integer.parseInt(json.get("temperature").toString())); 
+        park.updateTemperature(newTemperature);
     }
 
     @Transactional
     private void airQualityEvent(JsonNode json){
-        
+        Long parkID=Long.valueOf(json.get("park").toString());
+        Long sensorID=Long.valueOf(json.get("sensor").toString());
+        AirQuality newAirQuality= new AirQuality(AirQuality.createAirQualityId(park.getParkById(parkID), park.getSensorById(sensorID)), Integer.parseInt(json.get("aqi").toString())); 
+        park.updateAirQuality(newAirQuality);
     }
 }

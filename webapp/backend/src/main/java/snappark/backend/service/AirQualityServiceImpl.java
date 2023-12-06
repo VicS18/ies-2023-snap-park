@@ -19,8 +19,7 @@ public class AirQualityServiceImpl implements AirQualityService {
     public AirQuality getAirQuality(Long parkId, Long sensorId){ 
         Park park=parks.findById(parkId).orElse(null);
         Sensor sensor=sensors.findById(sensorId).orElse(null);
-        AirQuality airQuality = new AirQuality();
-        AirQualityId airQualityId = airQuality.new AirQualityId(park, sensor);
+        AirQualityId airQualityId = AirQuality.createAirQualityId(park, sensor);
 
         return temps.findById(airQualityId).orElse(null);    
     }

@@ -19,8 +19,7 @@ public class TemperatureServiceImpl implements TemperatureService {
     public Temperature getTemperature(Long parkId, Long sensorId){ 
         Park park=parks.findById(parkId).orElse(null);
         Sensor sensor=sensors.findById(sensorId).orElse(null);
-        Temperature temperature = new Temperature();
-        TemperatureId temperatureId = temperature.new TemperatureId(park, sensor);
+        TemperatureId temperatureId =Temperature.createTemperatureId(park, sensor);
 
         return temps.findById(temperatureId).orElse(null);    
     }

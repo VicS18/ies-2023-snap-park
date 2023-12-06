@@ -8,6 +8,7 @@ import snappark.backend.entity.Light;
 import snappark.backend.entity.Occupancy;
 import snappark.backend.entity.OccupancyHistory;
 import snappark.backend.entity.Park;
+import snappark.backend.entity.Sensor;
 import snappark.backend.entity.Temperature;
 import snappark.backend.entity.User;
 
@@ -25,6 +26,8 @@ public interface ParkService {
     List<OccupancyHistory> getParkMovements(Long parkId);
 
     List<Park> getParksByUsername(String username);
+
+    Sensor getSensorById(Long id);
 
     User createUser(User user);
 

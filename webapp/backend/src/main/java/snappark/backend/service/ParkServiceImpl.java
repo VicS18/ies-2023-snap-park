@@ -109,6 +109,15 @@ public class ParkServiceImpl implements ParkService {
         return occupancyHistoryRepository.findById_ParkId(parkId);
     }
 
+    //
+    // Sensor entity operations
+    //
+
+
+    public Sensor getSensorById(Long id){
+        return sensorRepository.findById(id).get();
+    }
+
 
     //
     // User entity operations
