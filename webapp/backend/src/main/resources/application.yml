@@ -4,7 +4,7 @@ spring:
     username: root
     password: snap_park
   jpa:
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    database-platform: org.hibernate.dialect.CockroachDBDialect
     hibernate:
       ddl-auto: update
 

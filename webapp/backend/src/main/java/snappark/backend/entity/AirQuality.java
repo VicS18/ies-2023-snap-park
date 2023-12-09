@@ -6,7 +6,6 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
@@ -33,7 +32,7 @@ public class AirQuality {
     @Setter
     @NoArgsConstructor
     @AllArgsConstructor
-    public class AirQualityId implements Serializable{
+    public static class AirQualityId implements Serializable{
 
         @ManyToOne
         @JoinColumn(name="park_id")
@@ -45,4 +44,8 @@ public class AirQuality {
 
     }
 
+    // Static factory method to create AirQualityId instances
+    public static AirQualityId createAirQualityId(Park park, Sensor sensor) {
+        return new AirQualityId(park, sensor);
+    }
 }

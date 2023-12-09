@@ -6,5 +6,5 @@ import snappark.backend.entity.Light;
 import snappark.backend.entity.Light.LightId;
 
 public interface LightRepository extends JpaRepository<Light,LightId>{
-    
+
 }

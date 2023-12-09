@@ -4,10 +4,8 @@ services:
   rabbitmq:
     image: "rabbitmq:3.8-management"
     ports:
-      - "5671:5672"
-      - "15671:15672"
-    networks:
-      - roachnet
+      - "5672:5672"
+      - "15672:15672"
 
   cockroachdb:
     image: "cockroachdb/cockroach:v23.1.12"
@@ -19,12 +17,11 @@ services:
     ports:
       - "26257:26257"
       - "8080:8080"
-    networks:
-      - roachnet
     volumes:
       - roach-single:/cockroach/cockroach-data
   app:
     depends_on:
+      - rabbitmq
       - cockroachdb
     build: ./backend
     restart: on-failure
@@ -41,8 +38,6 @@ services:
       }'
     volumes:
       - .m2:/root/.m2
-    networks:
-      - roachnet
     stdin_open: true
     tty: true
     
@@ -50,13 +45,6 @@ services:
     build: ./frontend/snappark
     ports:
       - "5000:5000"
-    networks:
-      - roachnet
-
-
-networks:
-  roachnet:
-    driver: bridge
 
 volumes:
   roach-single:

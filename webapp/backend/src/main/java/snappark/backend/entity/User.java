@@ -16,17 +16,20 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(exclude = "managers")
+@ToString(exclude = "managers")
 @Entity
 @Table(name = "app_user")
 public class User {
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
-    private Long id;
+    Long id;
     
     @Column(unique = true, nullable = false)
     private String name;
@@ -35,5 +38,6 @@ public class User {
     private String password;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Manager> managers = new HashSet<Manager>();
+    Set<Manager> managers = new HashSet<Manager>();
+
 }

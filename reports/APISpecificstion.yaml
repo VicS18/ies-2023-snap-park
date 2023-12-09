@@ -1,6 +1,6 @@
 openapi: 3.0.3
 info:
-  title: SnapPark 3.0
+  title: SnapPark
   description: |-
     
     SnapPark REST API specification.
@@ -12,7 +12,7 @@ servers:
 
 
 paths:
-  /park/{username}:
+  /parks/{username}:
     post:
       tags:
         - park
@@ -38,7 +38,35 @@ paths:
           description: Bad request. Check the request payload.
         '500':
           description: Internal server error.
-  /park/{parkId}:
+    get:
+      tags:
+        - park
+      summary: Get a list of all parks of user
+      operationId: listParks
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The username of the user that owns the parks
+        - name: name
+          in: query
+          description: Filter parks by name
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ParkId'
+        '500':
+          description: Internal server error
+  /parks/{parkId}:
     put:
       tags:
         - park
@@ -110,36 +138,7 @@ paths:
           description: Park not found
         '500':
           description: Internal server error
-  /parks/{username}:
-    get:
-      tags:
-        - park
-      summary: Get a list of all parks of user
-      operationId: listParks
-      parameters:
-        - name: username
-          in: path
-          required: true
-          schema:
-            type: string
-          description: The username of the user that owns the parks
-        - name: name
-          in: query
-          description: Filter parks by name
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/ParkId'
-        '500':
-          description: Internal server error
-  /park/movements/{parkId}:
+  /parks/movements/{parkId}:
     get:
       tags:
           - park
@@ -179,7 +178,7 @@ paths:
         '500':
           description: Internal server error
           
-  /park/occupancies/{parkId}:
+  /parks/occupancies/{parkId}:
     get:
       tags:
           - park
@@ -203,7 +202,7 @@ paths:
                   $ref: '#/components/schemas/Occupancy'
         '500':
           description: Internal server error
-  /park/alarms/{parkId}:
+  /parks/alarms/{parkId}:
     get:
       tags:
           - park
@@ -227,7 +226,7 @@ paths:
                   $ref: '#/components/schemas/Alert'
         '500':
           description: Internal server error
-  /sensor/{parkId}/{sensor}:
+  /parks/sensors/{parkId}/{sensor}:
     put:
       tags:
         - sensor
@@ -257,7 +256,7 @@ paths:
           description: Internal server error
           
           
-  /user:
+  /users:
     post:
       tags:
         - user
@@ -277,7 +276,7 @@ paths:
           description: Bad request. Check the request payload.
         '500':
           description: Internal server error.
-  /user/{username}:
+  /users/{username}:
     get:
       tags:
         - user
@@ -442,9 +441,3 @@ components:
         date:
           type: string
           format: date
-        
-        
-        
-        
-        
-        
