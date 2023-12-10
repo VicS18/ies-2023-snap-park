@@ -19,8 +19,7 @@ public class LightServiceImpl implements LightService {
     public Light getLight(Long parkId, Long sensorId){ 
         Park park=parks.findById(parkId).orElse(null);
         Sensor sensor=sensors.findById(sensorId).orElse(null);
-        Light light = new Light();
-        LightId lightId = light.new LightId(park, sensor);
+        LightId lightId = Light.createLightId(park, sensor);
 
         return lights.findById(lightId).orElse(null);    
     }
