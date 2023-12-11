@@ -20,6 +20,6 @@ COPY --chown=svelteuser:svelteuser --from=build /app/build /app/package.json ./
 
 EXPOSE 5000
 
-ENV HOST=0.0.0.0 PORT=5000 NODE_ENV=production
+ENV HOST=0.0.0.0 PORT=5000 NODE_ENV=production ORIGIN=http://localhost:5000
 
 CMD ["dumb-init","node","index.js"]

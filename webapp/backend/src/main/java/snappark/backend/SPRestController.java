@@ -1,7 +1,6 @@
 package snappark.backend;
 
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.service.annotation.PutExchange;
 
 import lombok.AllArgsConstructor;
 import snappark.backend.entity.OccupancyHistory;
@@ -33,7 +32,7 @@ public class SPRestController {
     // Park operations
     //
 
-    @GetMapping("/parks/{username}")
+    @GetMapping("/parks/manager/{username}")
     public ResponseEntity<List<Park>> getParksByUser(@PathVariable String username, @RequestParam(required = false) Long id, @RequestParam(required = false) String name){
         // TODO: Handle case where username isn't provided or doesn't exist
         List<Park> retPark = parkService.getParksByUsername(username);
@@ -44,7 +43,7 @@ public class SPRestController {
         return new ResponseEntity<List<Park>>(retPark, HttpStatus.OK);
     } 
 
-    @PostMapping("/parks/{username}")
+    @PostMapping("/parks/manager/{username}")
     public ResponseEntity<Park> postPark(@RequestBody Park park, @PathVariable String username){
         Park savedPark = parkService.createPark(park, username);
         // TODO: Handle case where username doesn't correspond to existing User (in Managers)
