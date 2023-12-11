@@ -20,9 +20,6 @@ export async function load({ params }) {
   
     const monthlyRevenue = await fetch('http://app:9090/api/v1/parks/' + params.parkId + '/revenue/monthly');
 
-    const avgLightBody = avgLight.text() ?? 0;
-    const sensorCountBody = sensorCount.text() ?? 0;
-
 	return {
         park: parkGeneral.json(),
         avgLight: avgLight.json(),
