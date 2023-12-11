@@ -49,6 +49,8 @@ services:
   python-generator:
     image: python:3.9
     build: ../sensor/event_generator/generator
+    ports:
+      - 7070:7070
     depends_on:
       - rabbitmq
 

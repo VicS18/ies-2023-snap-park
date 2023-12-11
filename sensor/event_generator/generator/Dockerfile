@@ -10,4 +10,6 @@ RUN pip install --upgrade pip && \
 
 COPY . /app/
 
+EXPOSE 7070
+
 CMD ["python", "generator.py"]
