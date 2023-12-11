@@ -14,6 +14,7 @@ import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import snappark.backend.entity.AirQuality;
+import snappark.backend.entity.Alert;
 import snappark.backend.entity.Light;
 import snappark.backend.entity.Manager;
 import snappark.backend.entity.Occupancy;
@@ -35,6 +36,7 @@ import snappark.backend.repository.SensorRepository;
 import snappark.backend.repository.TemperatureRepository;
 import snappark.backend.repository.TransactionRepository;
 import snappark.backend.repository.UserRepository;
+import snappark.backend.repository.AlertRepository;
 
 
 @Service
@@ -72,6 +74,9 @@ public class ParkServiceImpl implements ParkService {
 
     @Autowired(required = true)
     private TransactionRepository transactionRepository;
+
+    @Autowired(required = true)
+    private AlertRepository alertRepository;
 
     //
     // Park entity operations
@@ -282,4 +287,13 @@ public class ParkServiceImpl implements ParkService {
         return calendar.getTimeInMillis();
     }
 
+    //
+    // Alert entity operations
+    //
+    public Alert createAlert(Alert alert){
+        return alertRepository.save(alert);
+    }
+    public List<Alert> getAllAlerts(){
+        return alertRepository.findAll();
+    }
 }

@@ -1,7 +1,6 @@
 package snappark.backend.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 
 import snappark.backend.entity.LightHistory;
 import snappark.backend.entity.LightHistory.LightHistoryId;
