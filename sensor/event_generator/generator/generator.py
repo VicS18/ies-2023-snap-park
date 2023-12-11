@@ -341,8 +341,6 @@ def main():
     finally:
         connection.close()
 
-if __name__ == "__main__":
-    main()
 
 def update(queue_name, conn):   
     global gen 
@@ -365,7 +363,7 @@ def update(queue_name, conn):
     print( "    All: " , events )
 
     channel = conn.channel()
-    channel.queue_declare(queue=queue_name)
+    channel.queue_declare(queue=queue_name, durable=True)
 
     for event in events:
         channel.basic_publish(exchange='', routing_key=queue_name, body=json.dumps(event))
@@ -401,3 +399,7 @@ def update(queue_name, conn):
 # fig, ax = plt.subplots()
 # animation = FuncAnimation(fig, update, frames=300, interval=10)
 # animation.save('animated_plot.gif', writer='ffmpeg')
+
+
+if __name__ == "__main__":
+    main()

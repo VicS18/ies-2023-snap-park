@@ -69,14 +69,14 @@ public class EventConsumer {
 
         if (intensity>1500){
             Alert newAlert=new Alert();
-            newAlert.setText("High luminescence! Currently at "+intensity+"! Top limit is 1500.");
+            newAlert.setText("High luminescence! Currently at "+intensity+"! Top limit is 1500 lux.");
             newAlert.setDate(System.currentTimeMillis());
             park.createAlert(newAlert);
             socket.sendNotification(newAlert);
         }
         else if (intensity<40){
             Alert newAlert=new Alert();
-            newAlert.setText("Low luminescence! Currently at "+intensity+"! Bottom limit is 40.");
+            newAlert.setText("Low luminescence! Currently at "+intensity+"! Bottom limit is 40 lux.");
             newAlert.setDate(System.currentTimeMillis());
             park.createAlert(newAlert);
             socket.sendNotification(newAlert);
@@ -116,7 +116,7 @@ public class EventConsumer {
         Long parkID=Long.valueOf(json.get("park").asText());
         Long sensorID=Long.valueOf(json.get("sensor").asText());
         int aq= Integer.parseInt(json.get("aqi").asText());
-        if (aq>35){
+        if (aq>200){
             Alert newAlert=new Alert();
             newAlert.setText("High air quality! Currently at "+ aq + "! Top limit is 200.");
             newAlert.setDate(System.currentTimeMillis());
