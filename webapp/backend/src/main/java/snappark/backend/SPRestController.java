@@ -10,6 +10,8 @@ import snappark.backend.service.ParkService;
 
 import java.util.List;
 
+import javax.swing.RepaintManager;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -75,12 +77,37 @@ public class SPRestController {
     // Park-Event operations
     //
 
-    @GetMapping("/parks/movements/{parkId}")
+    @GetMapping("/parks/{parkId}/movements")
     public ResponseEntity<List<OccupancyHistory>> getMovements(@PathVariable Long parkId){
         // TODO: Handle Park not found
 
         List<OccupancyHistory> movements = parkService.getParkMovements(parkId);
         return new ResponseEntity<List<OccupancyHistory>>(movements, HttpStatus.OK);
+    }
+
+    // TODO: Consider using an @Entity for the return values of these two methods
+
+    @GetMapping("/parks/{parkId}/avgLight")
+    public ResponseEntity<Double> getAvgLight(@PathVariable Long parkId) {
+        // TODO: Handle park not found
+
+        Double averageLightLevel = parkService.getAvgLightLevel(parkId);
+        if (averageLightLevel == null)
+            averageLightLevel = Double.valueOf(0);
+
+        return new ResponseEntity<Double>(averageLightLevel, HttpStatus.OK);
+    }
+
+    @GetMapping("/parks/{parkId}/sensorCount")
+    public ResponseEntity<Integer> getSensorCount(@PathVariable Long parkId) {
+        Integer sensorCount = parkService.getSensorCount(parkId);
+        return ResponseEntity.ok(sensorCount);
+    }
+
+    @GetMapping("/parks/{parkId}/revenue/annual")
+    public ResponseEntity<Double> getAnnualRevenue(@PathVariable Long parkId) {
+        Double annualRevenue = parkService.getAnnualRevenue(parkId);
+        return ResponseEntity.ok(annualRevenue);
     }
 
     //

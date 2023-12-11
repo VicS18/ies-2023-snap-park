@@ -56,7 +56,7 @@ public class EventConsumer {
     private void lightEvent(JsonNode json){
         Long parkID=Long.valueOf(json.get("park").toString());
         Long sensorID=Long.valueOf(json.get("sensor").toString());
-        Light newLight= new Light(Light.createLightId(park.getParkById(parkID), park.getSensorById(sensorID)), Integer.parseInt(json.get("intensity").toString())); 
+        Light newLight= new Light(Light.createLightId(park.getParkById(parkID), park.getSensorById(sensorID)), Double.parseDouble(json.get("intensity").toString())); 
         park.updateLight(newLight);
     }
 

@@ -9,6 +9,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -44,9 +46,9 @@ public class OccupancyHistory {
         @JoinColumn(name="park_id")
         private Park park;
 
-        @ManyToOne
-        @JoinColumn(name="sensor_id")
-        private Sensor sensor;
+        @GeneratedValue(strategy=GenerationType.IDENTITY)
+        @Column(name="id") // Just making sure there's no confusion about this
+        private Long id;
     }
 
 }

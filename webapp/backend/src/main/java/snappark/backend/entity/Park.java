@@ -45,6 +45,9 @@ public class Park {
     @Column(nullable = false)
     private float entranceFee;
 
+    @Column
+    private int maxLotation;
+
     @OneToMany(mappedBy = "park")
     @JsonIgnore
     Set<Manager> managers = new HashSet<Manager>();

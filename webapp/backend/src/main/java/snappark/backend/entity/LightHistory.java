@@ -2,11 +2,12 @@ package snappark.backend.entity;
 
 import java.io.Serializable;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
@@ -39,6 +40,7 @@ public class LightHistory {
     public class LightHistoryId implements Serializable{
         @ManyToOne
         @JoinColumn(name="park_id")
+        @JsonIgnore
         private Park park;
 
         @OneToOne
