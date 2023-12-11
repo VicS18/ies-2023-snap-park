@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  rabbitmq:
+    image: "rabbitmq:3.8-management"
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - roachnet
+
+  cockroachdb:
+    image: "cockroachdb/cockroach:v23.1.12"
+    command: start-single-node --http-addr=localhost:8080 --insecure
+    environment:
+      - COCKROACH_DATABASE=snap_park
+      - COCKROACH_USER=root
+      - COCKROACH_PASSWORD=snap_park
+    ports:
+      - "26257:26257"
+      - "8080:8080"
+    networks:
+      - roachnet
+    volumes:
+      - roach-single:/cockroach/cockroach-data
+
+#  springboot-app:
+#    image: "your-spring-boot-image:tag"
+#    ports:
+#      - "9090:9090"
+#    environment:
+#      SPRING_DATASOURCE_URL: jdbc:postgresql://cockroachdb:26257/snap_park?sslmode=disable
+#      SPRING_DATASOURCE_USERNAME: root
+#      SPRING_DATASOURCE_PASSWORD: snap_park
+#    depends_on:
+#      - cockroachdb
+#    networks:
+#      - roachnet
+
+networks:
+  roachnet:
+    driver: bridge
+
+volumes:
+  roach-single:
