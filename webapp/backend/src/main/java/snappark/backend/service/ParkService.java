@@ -53,6 +53,8 @@ public interface ParkService {
 
     Double getAnnualRevenue(Long parkId);
 
+    Double getMonthlyRevenue(Long parkId);
+
     // Light ops
 
     Optional<Light> getLightByParkAndSensor(Long parkID, Long SensorID);

@@ -46,7 +46,7 @@ public class OccupancyHistory {
         @JoinColumn(name="park_id")
         private Park park;
 
-        @GeneratedValue(strategy=GenerationType.IDENTITY)
+        @GeneratedValue(strategy=GenerationType.SEQUENCE)
         @Column(name="id") // Just making sure there's no confusion about this
         private Long id;
     }

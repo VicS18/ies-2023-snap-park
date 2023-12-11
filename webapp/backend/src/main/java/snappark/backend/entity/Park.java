@@ -27,7 +27,7 @@ import lombok.ToString;
 @Entity
 public class Park {
     @Id
-    @GeneratedValue(strategy=GenerationType.IDENTITY)
+    @GeneratedValue(strategy=GenerationType.SEQUENCE)
     Long id;
     
     @Column(unique = true, nullable = false)

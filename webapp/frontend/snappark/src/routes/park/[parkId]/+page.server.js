@@ -6,16 +6,24 @@ export async function load({ params }) {
     // Fetch park info - VULNERABLE !!!
 
     // TODO: Refactor so only one API request is done instead of several
+
+    // NOTE: Javascript doesn't like null values when parsing JSON
+
     const parkGeneral = await fetch('http://app:9090/api/v1/parks/' + params.parkId);
+
     const avgLight = await fetch('http://app:9090/api/v1/parks/' + params.parkId + '/avgLight');
+
     const sensorCount = await fetch('http://app:9090/api/v1/parks/' + params.parkId + '/sensorCount');
 
-    const avgLightBody = avgLight.text() ?? 0;
-    const sensorCountBody = sensorCount.text() ?? 0;
+    const annualRevenue = await fetch('http://app:9090/api/v1/parks/' + params.parkId + '/revenue/annual');
+
+    const monthlyRevenue = await fetch('http://app:9090/api/v1/parks/' + params.parkId + '/revenue/monthly');
 
 	return {
         park: parkGeneral.json(),
-        avgLight: avgLightBody,
-        sensorCount: sensorCountBody
+        avgLight: avgLight.json(),
+        sensorCount: sensorCount.json(),
+        annualRevenue: annualRevenue.json(),
+        monthlyRevenue: monthlyRevenue.json()
 	};
 }
