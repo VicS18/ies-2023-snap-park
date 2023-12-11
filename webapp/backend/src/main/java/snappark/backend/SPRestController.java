@@ -6,7 +6,6 @@ import lombok.AllArgsConstructor;
 import snappark.backend.entity.OccupancyHistory;
 import snappark.backend.entity.Park;
 import snappark.backend.entity.User;
-import snappark.backend.service.EventConsumer;
 import snappark.backend.service.ParkService;
 
 import java.util.List;
