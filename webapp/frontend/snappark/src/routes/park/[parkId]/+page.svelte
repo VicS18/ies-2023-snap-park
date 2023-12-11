@@ -1,3 +1,46 @@
+<script>
+    import { onMount } from "svelte";
+    import Chart from "chart.js/auto";
+
+    export let data;
+    let park = data.park;
+    let avgLight = data.avgLight;
+    let sensorCount = data.sensorCount;
+    let occupancies = data.occupancies;
+
+    const makeChartOccupation = (array) => {
+        let _labels = [];
+        let _data = [];
+        array.forEach((element) => {
+            _labels.push(element["date"]);
+            _data.push(element["lotation"]);
+        });
+        
+        return {
+            labels: _labels,
+            datasets: [
+                {
+                    label: "Park Occupation",
+                    data: _data,
+                    backgroundColor: "rgba(75, 192, 192, 0.2)",
+                    borderColor: "rgba(75, 192, 192, 1)",
+                    borderWidth: 1,
+                },
+            ],
+        };
+    };
+    
+    let chart;
+    
+    onMount(() => {
+        const chartData = makeChartOccupation(occupancies);
+        new Chart(chart.getContext('2d'), {
+            type: "line",
+            data: chartData,
+        });
+    });
+</script>
+
 <!-- Page Heading -->
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
     <h1 class="h3 mb-0 text-gray-800">{park.name}</h1>
@@ -137,27 +180,13 @@
             <div
                 class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                 <a class="nav-link" href="park1.html">
-                    <h6 class="m-0 font-weight-bold text-primary">Park Movement</h6>
+                    <h6 class="m-0 font-weight-bold text-primary">Park Occupancy</h6>
                 </a>
-                <div class="dropdown no-arrow">
-                    <a class="dropdown-toggle" href="/" role="button" id="dropdownMenuLink"
-                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
-                    </a>
-                    <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in"
-                        aria-labelledby="dropdownMenuLink">
-                        <div class="dropdown-header">Dropdown Header:</div>
-                        <a class="dropdown-item" href="/">Action</a>
-                        <a class="dropdown-item" href="/">Another action</a>
-                        <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="/">Something else here</a>
-                    </div>
-                </div>
             </div>
             <!-- Card Body -->
             <div class="card-body">
                 <div class="chart-area">
-                    <canvas id="myAreaChart"></canvas>
+                    <canvas id="chartOccupation" bind:this={chart}></canvas>
                 </div>
             </div>
         </div>
@@ -306,10 +335,3 @@
 
     </div>
 </div>
-
-<script>
-    export let data;
-    let park = data.park;
-    let avgLight = data.avgLight;
-    let sensorCount = data.sensorCount;
-</script>

@@ -85,6 +85,13 @@ public class SPRestController {
         return new ResponseEntity<List<OccupancyHistory>>(movements, HttpStatus.OK);
     }
 
+    @GetMapping("/parks/{parkId}/occupancies")
+    public ResponseEntity<List<OccupancyHistory>> getOccupancies(@PathVariable Long parkId){
+        // TODO: all
+        List<OccupancyHistory> movements = parkService.getParkMovements(parkId);
+        return new ResponseEntity<List<OccupancyHistory>>(movements, HttpStatus.OK);
+    }
+
     // TODO: Consider using an @Entity for the return values of these two methods
 
     @GetMapping("/parks/{parkId}/avgLight")
