@@ -46,5 +46,13 @@ services:
     ports:
       - "5000:5000"
 
+  python-generator:
+    image: python:3.9
+    build: ../sensor/event_generator/generator
+    depends_on:
+      - rabbitmq
+
+
+  
 volumes:
   roach-single:
