@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import snappark.backend.entity.AirQuality;
@@ -31,7 +32,9 @@ import snappark.backend.repository.SensorRepository;
 import snappark.backend.repository.TemperatureRepository;
 import snappark.backend.repository.UserRepository;
 
+
 @Service
+@Transactional
 @AllArgsConstructor
 @NoArgsConstructor
 public class ParkServiceImpl implements ParkService {
@@ -65,7 +68,7 @@ public class ParkServiceImpl implements ParkService {
     //
     // Park entity operations
     // 
-
+    
     public Park getParkById(Long id){
         return parkRepository.findParkById(id);
     }

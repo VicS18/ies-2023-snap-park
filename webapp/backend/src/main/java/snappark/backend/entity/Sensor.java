@@ -29,7 +29,7 @@ public class Sensor {
     private String address;
     
     @ManyToOne
-    @JoinColumn(name="movie_id")
+    @JoinColumn(name="park_id")
     private Park park;
 
 }

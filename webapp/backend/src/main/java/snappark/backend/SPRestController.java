@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import snappark.backend.entity.OccupancyHistory;
 import snappark.backend.entity.Park;
 import snappark.backend.entity.User;
+import snappark.backend.service.EventConsumer;
 import snappark.backend.service.ParkService;
 
 import java.util.List;
@@ -31,7 +32,7 @@ public class SPRestController {
     //    
     // Park operations
     //
-
+    
     @GetMapping("/parks/manager/{username}")
     public ResponseEntity<List<Park>> getParksByUser(@PathVariable String username, @RequestParam(required = false) Long id, @RequestParam(required = false) String name){
         // TODO: Handle case where username isn't provided or doesn't exist
