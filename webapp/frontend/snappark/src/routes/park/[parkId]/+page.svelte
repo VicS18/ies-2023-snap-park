@@ -3,9 +3,10 @@
     import Chart from "chart.js/auto";
 
     export let data;
-    let park = data.park;
-    let avgLight = data.avgLight;
-    let sensorCount = data.sensorCount;
+    let avgLight = data.avgLight.avgLight;
+    let sensorCount = data.sensorCount.sensorCount;
+    let annualRevenue = data.annualRevenue.annualRevenue;
+    let monthlyRevenue = data.monthlyRevenue.monthlyRevenue;
     let occupancies = data.occupancies;
 
     const makeChartOccupation = (array) => {
@@ -43,7 +44,7 @@
 
 <!-- Page Heading -->
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
-    <h1 class="h3 mb-0 text-gray-800">{park.name}</h1>
+    <h1 class="h3 mb-0 text-gray-800">{data.park.name}</h1>
     <a href="/" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" data-toggle="modal" data-target="#addSensorModal"><i
         class="fas fa-plus fa-sm text-white-50"></i> Add Sensor </a>
     <a href="/" class="d-none d-sm-inline-block btn btn-sm btn-danger shadow-sm" data-toggle="modal" data-target="#remParkModal"><i
@@ -62,8 +63,8 @@
                         <div class="col mr-2">
                             <div class="h5 mb-0 font-weight-bold text-gray-800">Basic Info</div>
                                 <br>
-                            <div class="text-xs font-weight-bold text-secondary text-uppercase mb-1">{park.address}</div>
-                            <div class="text-xs font-weight text-secondary text-uppercase mb-1"> Capacity: {park.maxLotation}</div>
+                            <div class="text-xs font-weight-bold text-secondary text-uppercase mb-1">{data.park.address}</div>
+                            <div class="text-xs font-weight text-secondary text-uppercase mb-1"> Capacity: {data.park.maxLotation}</div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-address-book fa-2x text-gray-300"></i>
@@ -86,7 +87,7 @@
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
                                 Earnings (Monthly)</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">4,000€</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{monthlyRevenue} €</div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-calendar fa-2x text-gray-300"></i>
@@ -106,7 +107,7 @@
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
                                 Earnings (Annual)</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">13,000€</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{annualRevenue} €</div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-euro-sign fa-2x text-gray-300"></i>
@@ -128,7 +129,7 @@
                             </div>
                             <div class="row no-gutters align-items-center">
                                 <div class="col-auto">
-                                    <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">{avgLight}</div>
+                                    <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">{avgLight} Lux</div>
                                 </div>
                                 <div class="col">
                                     <div class="progress progress-sm mr-2">
@@ -335,3 +336,4 @@
 
     </div>
 </div>
+

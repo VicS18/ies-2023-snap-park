@@ -120,6 +120,12 @@ public class ParkServiceImpl implements ParkService {
         return transactionRepository.sumByParkIdTime(parkId, getCurrYearStart(), getNextYearStart());
     }
 
+    public Double getMonthlyRevenue(Long parkId){
+        // TODO: Check if park exists
+
+        return transactionRepository.sumByParkIdTime(parkId, getCurrMonthStart(), getNextMonthStart());
+    }
+
     //
     // Manager entity operations
     //
@@ -236,6 +242,28 @@ public class ParkServiceImpl implements ParkService {
         int currYear = calendar.get(Calendar.YEAR);
 
         calendar.set(currYear - 1901, 1, 1);
+        
+        return calendar.getTimeInMillis();
+    }
+
+    public static Long getNextMonthStart(){
+        Date date = new Date();
+        Calendar calendar = new GregorianCalendar();
+        calendar.setTime(date);
+        int currMonth = calendar.get(Calendar.MONTH);
+
+        calendar.set(calendar.get(Calendar.YEAR), currMonth, 1);
+        
+        return calendar.getTimeInMillis();
+    }
+
+    public static Long getCurrMonthStart(){
+        Date date = new Date();
+        Calendar calendar = new GregorianCalendar();
+        calendar.setTime(date);
+        int currMonth = calendar.get(Calendar.MONTH);
+
+        calendar.set(calendar.get(Calendar.YEAR), currMonth - 1, 1);
         
         return calendar.getTimeInMillis();
     }

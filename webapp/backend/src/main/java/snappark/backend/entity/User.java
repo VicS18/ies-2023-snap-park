@@ -30,7 +30,7 @@ import lombok.ToString;
 @Table(name = "app_user")
 public class User {
     @Id
-    @GeneratedValue(strategy=GenerationType.IDENTITY)
+    @GeneratedValue(strategy=GenerationType.SEQUENCE)
     Long id;
     
     @Column(unique = true, nullable = false)
