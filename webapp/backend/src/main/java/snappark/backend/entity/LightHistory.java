@@ -2,10 +2,15 @@ package snappark.backend.entity;
 
 import java.io.Serializable;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.annotation.Generated;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
@@ -22,7 +27,7 @@ import lombok.Setter;
 public class LightHistory {
 
     @EmbeddedId
-    private Long id;
+    private LightHistoryId id;
 
     @Column
     private int intensity;
@@ -38,11 +43,15 @@ public class LightHistory {
     public class LightHistoryId implements Serializable{
         @ManyToOne
         @JoinColumn(name="park_id")
+        @JsonIgnore
         private Park park;
 
         @OneToOne
         @JoinColumn(name="sensor_id")
         private Sensor sensor;
+
+        @GeneratedValue(strategy = GenerationType.SEQUENCE)
+        private Long id;
     }
 
 }

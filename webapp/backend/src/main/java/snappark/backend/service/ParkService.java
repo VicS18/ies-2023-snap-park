@@ -45,6 +45,18 @@ public interface ParkService {
 
     Light createLight(Light Light);
 
+    // Aggregations
+
+    Double getAvgLightLevel(Long parkId);
+
+    Integer getSensorCount(Long parkId);
+
+    Double getAnnualRevenue(Long parkId);
+
+    Double getMonthlyRevenue(Long parkId);
+
+    // Light ops
+
     Optional<Light> getLightByParkAndSensor(Long parkID, Long SensorID);
 
     Light updateLight(Light Light);

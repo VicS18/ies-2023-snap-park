@@ -6,6 +6,8 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
@@ -45,6 +47,7 @@ public class AirQualityHistory {
         @JoinColumn(name="sensor_id")
         private Sensor sensor;
 
+        @GeneratedValue(strategy = GenerationType.SEQUENCE)
         private Long id;
     }
 

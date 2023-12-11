@@ -19,24 +19,24 @@ import lombok.Setter;
 @Entity
 public class Transaction{
     @Id
-    @GeneratedValue(strategy=GenerationType.IDENTITY)
+    @GeneratedValue(strategy=GenerationType.SEQUENCE)
     private Long id;
     
     @ManyToOne
     @JoinColumn(name = "entrance_park_id", referencedColumnName = "park_id")
-    @JoinColumn(name = "entrance_sensor_id", referencedColumnName = "sensor_id")
+    @JoinColumn(name = "entrance_id", referencedColumnName = "id")
     private OccupancyHistory entrance;
 
     @ManyToOne
     @JoinColumn(name = "exit_park_id", referencedColumnName = "park_id")
-    @JoinColumn(name = "exit_sensor_id", referencedColumnName = "sensor_id")
+    @JoinColumn(name = "exit_id", referencedColumnName = "id")
     private OccupancyHistory exit;
 
     @Column
-    private long timestamp;
+    private Long timestamp;
 
     @Column
-    private float profit;
+    private Double profit;
 
 
 }

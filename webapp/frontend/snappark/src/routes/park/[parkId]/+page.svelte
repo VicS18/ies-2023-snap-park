@@ -1,9 +1,9 @@
 <!-- Page Heading -->
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
-    <h1 class="h3 mb-0 text-gray-800">Park 1 Dashboard</h1>
-    <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" data-toggle="modal" data-target="#addSensorModal"><i
+    <h1 class="h3 mb-0 text-gray-800">{data.park.name}</h1>
+    <a href="/" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" data-toggle="modal" data-target="#addSensorModal"><i
         class="fas fa-plus fa-sm text-white-50"></i> Add Sensor </a>
-    <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-danger shadow-sm" data-toggle="modal" data-target="#remParkModal"><i
+    <a href="/" class="d-none d-sm-inline-block btn btn-sm btn-danger shadow-sm" data-toggle="modal" data-target="#remParkModal"><i
             class="fas fa-trash fa-sm text-white-50"></i> Remove Park </a>
     
 </div>
@@ -17,13 +17,10 @@
                 <div class="card-body">
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                Basic Info</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">Basic Info</div>
                                 <br>
-                            <div class="text-xs font-weight-bold text-secondary text-uppercase mb-1">Rua Dom Nuno Alvares Pereira 3</div>
-                            <div class="text-xs font-weight text-secondary text-uppercase mb-1">Odivelas</div>
-                            <div class="text-xs font-weight text-secondary text-uppercase mb-1">Portugal</div>
-                            <div class="text-xs font-weight text-secondary text-uppercase mb-1"> total capacity: 120</div>
+                            <div class="text-xs font-weight-bold text-secondary text-uppercase mb-1">{data.park.address}</div>
+                            <div class="text-xs font-weight text-secondary text-uppercase mb-1"> Capacity: {data.park.maxLotation}</div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-address-book fa-2x text-gray-300"></i>
@@ -46,7 +43,7 @@
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
                                 Earnings (Monthly)</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">4,000€</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{monthlyRevenue} €</div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-calendar fa-2x text-gray-300"></i>
@@ -57,7 +54,7 @@
         </div>
     </div>
 
-    <!-- Earnings (Monthly) Card Example -->
+    <!-- Earnings (Annual) Card Example -->
     <div class="col-xl-3 col-md-6 mb-4">
         <div class="card border-bottom-success shadow h-100 py-2">
             <a class="nav-link" href="revenue.html">
@@ -66,7 +63,7 @@
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
                                 Earnings (Annual)</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">13,000€</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{annualRevenue} €</div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-euro-sign fa-2x text-gray-300"></i>
@@ -77,18 +74,18 @@
         </div>
     </div>
 
-    <!-- Earnings (Monthly) Card Example -->
+    <!-- Light Levels -->
     <div class="col-xl-3 col-md-6 mb-4">
         <div class="card border-bottom-info shadow h-100 py-2">
-            <a class="nav-link" href="park1.html">
+            <a class="nav-link" href="/">
                 <div class="card-body">
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Light Level 
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Average Light Level 
                             </div>
                             <div class="row no-gutters align-items-center">
                                 <div class="col-auto">
-                                    <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">70%</div>
+                                    <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">{avgLight} Lux</div>
                                 </div>
                                 <div class="col">
                                     <div class="progress progress-sm mr-2">
@@ -108,7 +105,7 @@
         </div>
     </div>
 
-    <!-- Pending Requests Card Example -->
+    <!-- Sensors -->
     <div class="col-xl-3 col-md-6 mb-4">
         <div class="card border-bottom-warning shadow h-100 py-2">
             <a class="nav-link" href="sensors.html">
@@ -117,7 +114,7 @@
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
                                 Sensors</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">7</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{sensorCount}</div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-cog fa-2x text-gray-300"></i>
@@ -143,17 +140,17 @@
                     <h6 class="m-0 font-weight-bold text-primary">Park Movement</h6>
                 </a>
                 <div class="dropdown no-arrow">
-                    <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
+                    <a class="dropdown-toggle" href="/" role="button" id="dropdownMenuLink"
                         data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
                     </a>
                     <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in"
                         aria-labelledby="dropdownMenuLink">
                         <div class="dropdown-header">Dropdown Header:</div>
-                        <a class="dropdown-item" href="#">Action</a>
-                        <a class="dropdown-item" href="#">Another action</a>
+                        <a class="dropdown-item" href="/">Action</a>
+                        <a class="dropdown-item" href="/">Another action</a>
                         <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="#">Something else here</a>
+                        <a class="dropdown-item" href="/">Something else here</a>
                     </div>
                 </div>
             </div>
@@ -176,17 +173,17 @@
                     <h6 class="m-0 font-weight-bold text-primary">Air Quality (%)</h6>
                 </a>
                 <div class="dropdown no-arrow">
-                    <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
+                    <a class="dropdown-toggle" href="/" role="button" id="dropdownMenuLink"
                         data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
                     </a>
                     <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in"
                         aria-labelledby="dropdownMenuLink">
                         <div class="dropdown-header">Dropdown Header:</div>
-                        <a class="dropdown-item" href="#">Action</a>
-                        <a class="dropdown-item" href="#">Another action</a>
+                        <a class="dropdown-item" href="/">Action</a>
+                        <a class="dropdown-item" href="/">Another action</a>
                         <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="#">Something else here</a>
+                        <a class="dropdown-item" href="/">Something else here</a>
                     </div>
                 </div>
             </div>
@@ -309,3 +306,11 @@
 
     </div>
 </div>
+
+<script>
+    export let data;
+    let avgLight = data.avgLight.avgLight;
+    let sensorCount = data.sensorCount.sensorCount;
+    let annualRevenue = data.annualRevenue.annualRevenue;
+    let monthlyRevenue = data.monthlyRevenue.monthlyRevenue;
+</script>
