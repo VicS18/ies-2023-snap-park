@@ -118,7 +118,7 @@ public class EventConsumer {
         int aq= Integer.parseInt(json.get("aqi").asText());
         if (aq>200){
             Alert newAlert=new Alert();
-            newAlert.setText("High air quality! Currently at "+ aq + "! Top limit is 200.");
+            newAlert.setText("High air quality! Currently at "+ aq + "! Top limit is 100.");
             newAlert.setDate(System.currentTimeMillis());
             park.createAlert(newAlert);
             socket.sendNotification(newAlert);
