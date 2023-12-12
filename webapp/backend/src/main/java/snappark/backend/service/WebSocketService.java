@@ -15,6 +15,6 @@ public class WebSocketService {
     }
 
     public void sendNotification(Alert alarm) {
-        messagingTemplate.convertAndSend("/alerts", alarm.toString());
+        messagingTemplate.convertAndSend("/alerts", alarm.getText());
     }
 }
