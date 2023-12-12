@@ -1,5 +1,6 @@
 package snappark.backend.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
@@ -7,14 +8,10 @@ import snappark.backend.entity.Alert;
 
 @Service
 public class WebSocketService {
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
 
-    private final SimpMessagingTemplate messagingTemplate;
-
-    public WebSocketService(SimpMessagingTemplate messagingTemplate) {
-        this.messagingTemplate = messagingTemplate;
-    }
-
-    public void sendNotification(Alert alarm) {
-        messagingTemplate.convertAndSend("/alerts", alarm.getText());
+    public void sendNotification(Alert alert) {
+        messagingTemplate.convertAndSend("/alerts/1", alert.getText());
     }
 }

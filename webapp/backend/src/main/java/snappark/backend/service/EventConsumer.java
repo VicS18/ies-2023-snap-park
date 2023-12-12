@@ -22,6 +22,7 @@ public class EventConsumer {
 
     @Autowired
     ParkService park;
+
     @RabbitListener(queues = "snap_park")
     public void handleMessage(String message) {
         try {
@@ -65,12 +66,13 @@ public class EventConsumer {
     private void lightEvent(JsonNode json){
         Long parkID=Long.valueOf(json.get("park").asText());
         Long sensorID=Long.valueOf(json.get("sensor").asText());
-        int intensity=Integer.parseInt(json.get("intensity").asText());
+        int intensity= (int)Math.floor(Double.parseDouble(json.get("intensity").asText()));
 
         if (intensity>1500){
             Alert newAlert=new Alert();
             newAlert.setText("High luminescence! Currently at "+intensity+"! Top limit is 1500 lux.");
             newAlert.setDate(System.currentTimeMillis());
+            //newAlert.setPark(park.getParkById(parkID));
             park.createAlert(newAlert);
             socket.sendNotification(newAlert);
         }
@@ -78,6 +80,7 @@ public class EventConsumer {
             Alert newAlert=new Alert();
             newAlert.setText("Low luminescence! Currently at "+intensity+"! Bottom limit is 40 lux.");
             newAlert.setDate(System.currentTimeMillis());
+            //newAlert.setPark(park.getParkById(parkID));
             park.createAlert(newAlert);
             socket.sendNotification(newAlert);
 
@@ -91,11 +94,12 @@ public class EventConsumer {
     private void temperatureEvent(JsonNode json){
         Long parkID=Long.valueOf(json.get("park").asText());
         Long sensorID=Long.valueOf(json.get("sensor").asText());
-        int temperature= Integer.parseInt(json.get("temperature").asText());
-        if (temperature>35){
+        int temperature= (int)Math.floor(Double.parseDouble(json.get("temperature").asText()));
+        if (temperature>1){
             Alert newAlert=new Alert();
             newAlert.setText("High temperature! Currently at "+temperature+"! Top limit is 35ºC.");
             newAlert.setDate(System.currentTimeMillis());
+            //newAlert.setPark(park.getParkById(parkID));
             park.createAlert(newAlert);
             socket.sendNotification(newAlert);
         }
@@ -103,6 +107,7 @@ public class EventConsumer {
             Alert newAlert=new Alert();
             newAlert.setText("Low temperature! Currently at "+temperature+"! Bottom limit is 5ºC.");
             newAlert.setDate(System.currentTimeMillis());
+            //newAlert.setPark(park.getParkById(parkID));
             park.createAlert(newAlert);
             socket.sendNotification(newAlert);
         }
@@ -116,10 +121,11 @@ public class EventConsumer {
         Long parkID=Long.valueOf(json.get("park").asText());
         Long sensorID=Long.valueOf(json.get("sensor").asText());
         int aq= Integer.parseInt(json.get("aqi").asText());
-        if (aq>200){
+        if (aq >100){
             Alert newAlert=new Alert();
-            newAlert.setText("High air quality! Currently at "+ aq + "! Top limit is 100.");
+            newAlert.setText("Bad air quality! Currently at "+ aq + "! Top limit is 100.");
             newAlert.setDate(System.currentTimeMillis());
+            //newAlert.setPark(park.getParkById(parkID));
             park.createAlert(newAlert);
             socket.sendNotification(newAlert);
         }
