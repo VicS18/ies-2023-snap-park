@@ -335,3 +335,25 @@
         </div>
     </div>
 </div>
+
+<script>
+    import { onMount } from 'svelte';
+    import { onDestroy } from 'svelte';
+
+    import stompService from './stompService';
+    let messages = stompService.messages;
+
+    // Connect to Stomp socket when the component is mounted
+    onMount(() => {
+        stompService.connect();
+        stompService.subscribe((updatedMessages) => {
+        messages = updatedMessages;
+        });
+    });
+
+    // Disconnect from Stomp socket when the component is destroyed
+    onDestroy(() => {
+        stompService.disconnect();
+    });
+    
+</script>
