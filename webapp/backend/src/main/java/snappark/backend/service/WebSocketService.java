@@ -5,6 +5,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import snappark.backend.entity.Alert;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 public class WebSocketService {
@@ -12,6 +13,11 @@ public class WebSocketService {
     private SimpMessagingTemplate messagingTemplate;
 
     public void sendNotification(Alert alert) {
-        messagingTemplate.convertAndSend("/alerts/1", alert.getText());
+        try{
+            messagingTemplate.convertAndSend("/alerts/1", new ObjectMapper().writeValueAsString(alert));
+        }
+        catch(Exception e){
+            System.err.println(e);
+        }
     }
 }

@@ -337,23 +337,46 @@
 </div>
 
 <script>
-    import { onMount } from 'svelte';
-    import { onDestroy } from 'svelte';
+    import { onMount, onDestroy } from 'svelte';
+    import * as Stomp from 'stompjs';
+    import SockJS from 'sockjs-client';
+    let messages=[];
 
-    import stompService from './stompService';
-    let messages = stompService.messages;
+    const stompService = {
+        stompClient: null,
+        
+        connect: () => {
+            var socket = new SockJS("http://localhost:9090/ws");
+            var stompClient = Stomp.over(socket);
+            stompClient.connect({}, function(frame) {
+                console.log("Connected to WebSocket:", frame);
 
-    // Connect to Stomp socket when the component is mounted
+                stompClient.subscribe('/alerts/'+"1", function(message) {
+                    console.log("Received message:", message.body);
+                    message=JSON.parse(message.body)
+                    const date = new Date(message.date);
+                    const formattedDate = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+                    const formattedTime = `${date.getHours()}:${(date.getMinutes() < 10 ? '0' : '') + date.getMinutes()}`;
+                    const formattedDateTime = `${formattedTime} ${formattedDate}`;
+                    message.date=formattedDateTime
+                    messages = [...messages, message];
+                });
+            });
+        },
+
+        disconnect: () => {
+            if (stompService.stompClient) {
+                stompService.stompClient.disconnect();
+            }
+        },
+    };
+
     onMount(() => {
         stompService.connect();
-        stompService.subscribe((updatedMessages) => {
-        messages = updatedMessages;
-        });
     });
 
-    // Disconnect from Stomp socket when the component is destroyed
     onDestroy(() => {
         stompService.disconnect();
     });
-    
 </script>
+
