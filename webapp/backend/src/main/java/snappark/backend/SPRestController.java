@@ -6,10 +6,11 @@ import lombok.AllArgsConstructor;
 import snappark.backend.entity.OccupancyHistory;
 import snappark.backend.entity.Park;
 import snappark.backend.entity.User;
-import snappark.backend.service.EventConsumer;
 import snappark.backend.service.ParkService;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -53,8 +54,8 @@ public class SPRestController {
     }
 
     @GetMapping("/parks/{parkId}")
-    public ResponseEntity<Park> getPark(@PathVariable Long id){
-        Park park = parkService.getParkById(id);
+    public ResponseEntity<Park> getPark(@PathVariable Long parkId){
+        Park park = parkService.getParkById(parkId);
         return new ResponseEntity<Park>(park, HttpStatus.OK);
     }
 
@@ -76,12 +77,70 @@ public class SPRestController {
     // Park-Event operations
     //
 
-    @GetMapping("/parks/movements/{parkId}")
+    @GetMapping("/parks/{parkId}/movements")
     public ResponseEntity<List<OccupancyHistory>> getMovements(@PathVariable Long parkId){
         // TODO: Handle Park not found
 
         List<OccupancyHistory> movements = parkService.getParkMovements(parkId);
         return new ResponseEntity<List<OccupancyHistory>>(movements, HttpStatus.OK);
+    }
+
+    // TODO: Consider using an @Entity for the return values of these two methods
+
+    @GetMapping("/parks/{parkId}/avgLight")
+    public ResponseEntity<Map<String, Double>> getAvgLight(@PathVariable Long parkId) {
+        // TODO: Handle park not found
+
+        Double averageLightLevel = parkService.getAvgLightLevel(parkId);
+        if (averageLightLevel == null)
+            averageLightLevel = Double.valueOf(0);
+        System.out.println("AVG LL: " + averageLightLevel);
+
+        // We're meant to just return a double value, but javascript's fetch API doesn't like non-JSON response bodies
+        Map<String, Double> avgLight = new HashMap<String, Double>();
+        avgLight.put("avgLight", averageLightLevel);
+
+        return new ResponseEntity<Map<String, Double>>(avgLight, HttpStatus.OK);
+    }
+
+    @GetMapping("/parks/{parkId}/sensorCount")
+    public ResponseEntity<Map<String, Integer>> getSensorCount(@PathVariable Long parkId) {
+        Integer sensorCt = parkService.getSensorCount(parkId);
+        System.out.println("SENSOR COUNT: " + sensorCt);
+
+        // We're meant to just return a double value, but javascript's fetch API doesn't like non-JSON response bodies
+        Map<String, Integer> sensorCount = new HashMap<String, Integer>();
+        sensorCount.put("sensorCount", sensorCt);
+
+        return ResponseEntity.ok(sensorCount);
+    }
+
+    @GetMapping("/parks/{parkId}/revenue/annual")
+    public ResponseEntity<Map<String, Double>> getAnnualRevenue(@PathVariable Long parkId) {
+
+        Double anRev = parkService.getAnnualRevenue(parkId);
+        if(anRev == null)
+            anRev = Double.valueOf(0);
+        System.out.println("ANNUAL REVENUE: " + anRev);
+
+        Map<String, Double> annualRevenue = new HashMap<String, Double>();
+        annualRevenue.put("annualRevenue", anRev);
+
+        return ResponseEntity.ok(annualRevenue);
+    }
+
+    @GetMapping("/parks/{parkId}/revenue/monthly")
+    public ResponseEntity<Map<String, Double>> getMonthlyRevenue(@PathVariable Long parkId) {
+
+        Double monRev = parkService.getMonthlyRevenue(parkId);
+        if(monRev == null)
+            monRev = Double.valueOf(0);
+        System.out.println("MONTHLY REVENUE: " + monRev);
+
+        Map<String, Double> monthlyRevenue = new HashMap<String, Double>();
+        monthlyRevenue.put("monthlyRevenue", monRev);
+
+        return ResponseEntity.ok(monthlyRevenue);
     }
 
     //

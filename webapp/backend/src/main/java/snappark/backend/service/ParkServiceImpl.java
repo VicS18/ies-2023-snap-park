@@ -1,5 +1,8 @@
 package snappark.backend.service;
 
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -11,6 +14,7 @@ import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import snappark.backend.entity.AirQuality;
+import snappark.backend.entity.Alert;
 import snappark.backend.entity.Light;
 import snappark.backend.entity.Manager;
 import snappark.backend.entity.Occupancy;
@@ -30,7 +34,9 @@ import snappark.backend.repository.OccupancyRepository;
 import snappark.backend.repository.ParkRepository;
 import snappark.backend.repository.SensorRepository;
 import snappark.backend.repository.TemperatureRepository;
+import snappark.backend.repository.TransactionRepository;
 import snappark.backend.repository.UserRepository;
+import snappark.backend.repository.AlertRepository;
 
 
 @Service
@@ -65,6 +71,13 @@ public class ParkServiceImpl implements ParkService {
 
     @Autowired(required = true)
     private OccupancyHistoryRepository occupancyHistoryRepository;
+
+    @Autowired(required = true)
+    private TransactionRepository transactionRepository;
+
+    @Autowired(required = true)
+    private AlertRepository alertRepository;
+
     //
     // Park entity operations
     // 
@@ -97,6 +110,28 @@ public class ParkServiceImpl implements ParkService {
 
     public void deletePark(Long parkId){
         parkRepository.deleteById(parkId);
+    }
+
+    // Park aggregations
+
+    public Integer getSensorCount(Long parkId){
+        Park park = parkRepository.findParkById(parkId);
+        return sensorRepository.countByPark(park);
+    }
+
+    // TODO: Generalize to monthly revenue as well
+
+    public Double getAnnualRevenue(Long parkId){
+        // TODO: Check if park exists
+
+        // 1st of January of next year to the current year
+        return transactionRepository.sumByParkIdTime(parkId, getCurrYearStart(), getNextYearStart());
+    }
+
+    public Double getMonthlyRevenue(Long parkId){
+        // TODO: Check if park exists
+
+        return transactionRepository.sumByParkIdTime(parkId, getCurrMonthStart(), getNextMonthStart());
     }
 
     //
@@ -165,19 +200,24 @@ public class ParkServiceImpl implements ParkService {
 
     public Temperature updateTemperature(Temperature temperature){
         return temperatureRepository.save(temperature);
-    }   
+    }
     //
     // Light entity operations
     //
     public Light createLight(Light light){
         return lightRepository.save(light);
     }
+
+    public Double getAvgLightLevel(Long parkId){
+        Park park = parkRepository.findParkById(parkId);
+        return lightRepository.getAvgLightLevel(park);
+    }
     
     public Optional<Light> getLightByParkAndSensor(Long parkId, Long sensorId){
-        Park park=parkRepository.findParkById(parkId);
-        Sensor sensor=sensorRepository.findById(sensorId).get();
+        Park park = parkRepository.findParkById(parkId);
+        Sensor sensor = sensorRepository.findById(sensorId).get();
 
-        LightId temp= Light.createLightId(park,sensor);
+        LightId temp = Light.createLightId(park,sensor);
         return lightRepository.findById(temp);
     }
 
@@ -203,6 +243,57 @@ public class ParkServiceImpl implements ParkService {
         return airQualityRepository.save(airQuality);
     }
 
-    
-    
+    public static Long getNextYearStart(){
+        Date date = new Date();
+        Calendar calendar = new GregorianCalendar();
+        calendar.setTime(date);
+        int currYear = calendar.get(Calendar.YEAR);
+
+        calendar.set(currYear - 1901, 1, 1);
+        
+        return calendar.getTimeInMillis();
+    }
+
+    public static Long getNextMonthStart(){
+        Date date = new Date();
+        Calendar calendar = new GregorianCalendar();
+        calendar.setTime(date);
+        int currMonth = calendar.get(Calendar.MONTH);
+
+        calendar.set(calendar.get(Calendar.YEAR), currMonth, 1);
+        
+        return calendar.getTimeInMillis();
+    }
+
+    public static Long getCurrMonthStart(){
+        Date date = new Date();
+        Calendar calendar = new GregorianCalendar();
+        calendar.setTime(date);
+        int currMonth = calendar.get(Calendar.MONTH);
+
+        calendar.set(calendar.get(Calendar.YEAR), currMonth - 1, 1);
+        
+        return calendar.getTimeInMillis();
+    }
+
+    public static Long getCurrYearStart(){
+        Date date = new Date();
+        Calendar calendar = new GregorianCalendar();
+        calendar.setTime(date);
+        int currYear = calendar.get(Calendar.YEAR);
+
+        calendar.set(currYear - 1900, 1, 1);
+        
+        return calendar.getTimeInMillis();
+    }
+
+    //
+    // Alert entity operations
+    //
+    public Alert createAlert(Alert alert){
+        return alertRepository.save(alert);
+    }
+    public List<Alert> getAllAlerts(){
+        return alertRepository.findAll();
+    }
 }

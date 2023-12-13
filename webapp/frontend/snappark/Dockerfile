@@ -16,7 +16,9 @@ USER svelteuser
 
 WORKDIR /app
 
-COPY --chown=svelteuser:svelteuser --from=build /app/build /app/package.json ./
+COPY --chown=svelteuser:svelteuser --from=build /app/build /app
+COPY --chown=svelteuser:svelteuser --from=build /app/node_modules /app/node_modules
+COPY --chown=svelteuser:svelteuser --from=build /app/package.json /app
 
 EXPOSE 5000
 
