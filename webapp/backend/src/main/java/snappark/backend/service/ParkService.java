@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import snappark.backend.entity.AirQuality;
+import snappark.backend.entity.Alert;
 import snappark.backend.entity.Light;
 import snappark.backend.entity.Occupancy;
 import snappark.backend.entity.OccupancyHistory;
@@ -66,5 +67,10 @@ public interface ParkService {
     Optional<AirQuality> getAirQualityByParkAndSensor(Long parkID, Long SensorID);
 
     AirQuality updateAirQuality(AirQuality airQuality);
+
+    // Alert ops
+
+    Alert createAlert(Alert alert);
+    List<Alert> getAllAlerts();
 
 }

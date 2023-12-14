@@ -1,2 +1,5 @@
 *.gif
 .venv
+.venv
+__*
+*.gif

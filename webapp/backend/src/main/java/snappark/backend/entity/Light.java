@@ -25,7 +25,7 @@ public class Light {
     private LightId id;
 
     @Column
-    private Double intensity;
+    private int intensity;
 
     @Embeddable
     @Getter

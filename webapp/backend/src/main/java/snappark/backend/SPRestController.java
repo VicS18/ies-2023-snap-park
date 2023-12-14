@@ -33,7 +33,7 @@ public class SPRestController {
     //    
     // Park operations
     //
-
+    
     @GetMapping("/parks/manager/{username}")
     public ResponseEntity<List<Park>> getParksByUser(@PathVariable String username, @RequestParam(required = false) Long id, @RequestParam(required = false) String name){
         // TODO: Handle case where username isn't provided or doesn't exist
