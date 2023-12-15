@@ -119,24 +119,26 @@ public class SPRestController {
         ArrayList<OccupancyRecord> points= new ArrayList<OccupancyRecord>();
 
         Long interval=(finishDate-startDate)/(numPoints-1); //Equal division of time to obtain numPoint-1 intervals
-        Long ts=interval+startDate; //current timestamp\\
+        Long ts=startDate; //current timestamp\\
         for (int i=1;i<movements.size();i++) {
             if (movements.get(i).getDate()>ts){
                 OccupancyHistory previous=movements.get(i-1);
                 OccupancyRecord newPoint= new OccupancyRecord(ts, previous.getLotation());
                 points.add(newPoint);
+                if(points.size()==numPoints)
+                    break;
                 ts+=interval;
             }    
         }
         if (points.size()==0)
-            for(int x=0;x<numPoints-points.size();x++){
+            for(int x=0;x<numPoints;x++){
                 points.add(new OccupancyRecord(ts, 0));
                 ts+=interval;
             }
         else if (points.size()<numPoints){
             OccupancyRecord lastPoint=points.get(points.size()-1);
             for(int x=0;x<numPoints-points.size();x++){
-                points.add(new OccupancyRecord(ts, lastPoint.lotation));
+                points.add(new OccupancyRecord(ts, lastPoint.getLotation()));
                 ts+=interval;
             }
         }

@@ -14,8 +14,8 @@ export async function load({ params }) {
 
     const sensorCount = await fetch('http://app:9090/api/v1/parks/' + params.parkId + '/sensorCount');
 
-    const occupancies = await fetch('http://app:9090/api/v1/parks/' + params.parkId + '/occupancies/' + 0 + '/' + new Date().getTime() + '/' + 25);
-    console.log("occupancies:" + occupancies);
+    const occupancies = await fetch('http://app:9090/api/v1/parks/' + params.parkId + '/occupancies/' + 1702669451000 + '/' + new Date().getTime() + '/' + 15);
+
     const annualRevenue = await fetch('http://app:9090/api/v1/parks/' + params.parkId + '/revenue/annual');
 
     const monthlyRevenue = await fetch('http://app:9090/api/v1/parks/' + params.parkId + '/revenue/monthly');

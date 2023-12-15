@@ -321,11 +321,11 @@ l = ligthState()
 t = temperatureState()
 a = airState()
 m_gens = [ movementsGen(i,p) for i in range(1,3) ]
-l_gens = [ ligthGen(100,l,10,1),ligthGen(101,l,10,0.2),ligthGen(102,l,10,0,10e2)  ]
+l_gens = [ ligthGen(100,l,10,1),ligthGen(101,l,10,0.2),ligthGen(102,l,10,10e2,0)  ]
 t_gens = [ temperatureGen(200,t,10,1,14),temperatureGen(201,t,10,0.1,18) ]
 a_gens = [ airGen(300,a,10,1,0,0),airGen(301,a,10,0.5,15,6),airGen(302,a,10,0.1,30,2) ]
 gens = m_gens + l_gens + t_gens + a_gens
-gen = eventGen(1,10,gens,[p,l,t,a]) # timescale around sampling rate is good ( 10 )
+gen = eventGen(1,600,gens,[p,l,t,a]) # timescale around sampling rate is good ( 10 )
 gen.start()
 
 QUEUE_NAME = 'snap_park'

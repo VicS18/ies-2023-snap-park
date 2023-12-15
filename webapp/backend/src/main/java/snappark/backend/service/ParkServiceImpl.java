@@ -151,17 +151,17 @@ public class ParkServiceImpl implements ParkService {
     }
 
     public List<OccupancyHistory> getParkMovements(Long parkId){
-        return occupancyHistoryRepository.findById_ParkId(parkId);
+        return occupancyHistoryRepository.findByPark(parkRepository.findParkById(parkId));
     }
 
     public List<OccupancyHistory> getParkMovementsByDate(long parkId, long startDate, long endDate){
-        return occupancyHistoryRepository.findByDateBetweenAndId_Park_IdOrderByDateAsc(parkId,startDate,endDate);
+        Park fPark=parkRepository.findParkById(parkId);
+        return occupancyHistoryRepository.findByDateBetweenAndParkOrderByDateAsc(startDate,endDate,fPark);
     }
 
     //
     // Sensor entity operations
     //
-
 
     public Sensor getSensorById(Long id){
         return sensorRepository.findById(id).get();

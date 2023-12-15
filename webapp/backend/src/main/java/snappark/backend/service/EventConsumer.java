@@ -53,21 +53,18 @@ public class EventConsumer {
     private void trafficEvent(JsonNode json){
         Long parkID=Long.valueOf(json.get("park").asText());
         Occupancy o=park.getOccupancyByParkId(parkID).get();
-        //check if parks exists
         OccupancyHistory occupancyHistory = new OccupancyHistory();
-        OccupancyHistory.OccupancyHistoryId occupancyHistoryId =  occupancyHistory.new OccupancyHistoryId();
-        occupancyHistoryId.setPark(park.getParkById(parkID));
-        occupancyHistory.setId(occupancyHistoryId);
-        occupancyHistory.setUser(park.getUserById(Long.valueOf(json.get("vehicle").asText())));
-        occupancyHistory.setType(json.get("entering").asBoolean());
+        occupancyHistory.setPark(park.getParkById(parkID));
+        //occupancyHistory.setUser(park.getUserById(Long.valueOf(json.get("vehicle").asText())));
+        occupancyHistory.setType(Boolean.parseBoolean(json.get("entering").asText().toLowerCase()));
         occupancyHistory.setDate(Long.valueOf(json.get("ts").asText()));
         if (json.get("entering").asBoolean()==true){
-            o.setLotation(o.getLotation()+1);
             occupancyHistory.setLotation(o.getLotation()+1);
+            o.setLotation(o.getLotation()+1);
         }
         else{
-            o.setLotation(o.getLotation()-1);
             occupancyHistory.setLotation(o.getLotation()-1);
+            o.setLotation(o.getLotation()-1);
         }
         park.updateOccupancy(o);
         park.createParkMovement(occupancyHistory);
@@ -87,7 +84,7 @@ public class EventConsumer {
             newAlert.setDate(System.currentTimeMillis());
             //newAlert.setPark(park.getParkById(parkID));
             park.createAlert(newAlert);
-            socket.sendNotification(newAlert);
+            socket.sendNotification(newAlert); 
         }
         else if (intensity<40){
             Alert newAlert=new Alert();
@@ -96,9 +93,8 @@ public class EventConsumer {
             //newAlert.setPark(park.getParkById(parkID));
             park.createAlert(newAlert);
             socket.sendNotification(newAlert);
-
         }
-
+        
         Light newLight= new Light(Light.createLightId(park.getParkById(parkID), park.getSensorById(sensorID)), intensity); 
         park.updateLight(newLight);
     }

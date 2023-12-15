@@ -13,7 +13,11 @@
         let _labels = [];
         let _data = [];
         array.forEach((element) => {
-            _labels.push(element["date"]);
+            var dateObject = new Date(element["date"]);
+
+            var formattedDate = dateObject.toLocaleString();
+
+            _labels.push(formattedDate);
             _data.push(element["lotation"]);
         });
         
