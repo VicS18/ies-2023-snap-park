@@ -14,13 +14,11 @@
         "svelte": "^4.2.7",
         "vite": "^4.4.2"
     },
+    "type": "module",
     "dependencies": {
+        "chart.js": "^4.4.1",
         "sockjs-client": "^1.5.0",
         "stompjs": "^2.3.3",
         "ws": "^8.0.0"
-    },
-    "type": "module",
-    "dependencies": {
-        "chart.js": "^4.4.1"
     }
 }

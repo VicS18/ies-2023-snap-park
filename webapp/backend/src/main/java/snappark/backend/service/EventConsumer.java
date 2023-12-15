@@ -1,7 +1,6 @@
 
 package snappark.backend.service;
 
-import java.util.Optional;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,6 +12,7 @@ import snappark.backend.entity.AirQuality;
 import snappark.backend.entity.Alert;
 import snappark.backend.entity.Light;
 import snappark.backend.entity.Occupancy;
+import snappark.backend.entity.OccupancyHistory;
 import snappark.backend.entity.Temperature;
 
 @Service
@@ -52,13 +52,26 @@ public class EventConsumer {
 
     private void trafficEvent(JsonNode json){
         Long parkID=Long.valueOf(json.get("park").asText());
-        Optional<Occupancy> o=park.getOccupancyByParkId(parkID);
+        Occupancy o=park.getOccupancyByParkId(parkID).get();
         //check if parks exists
-        if (o.isPresent())
-        {
-            if (json.get("entering").asText().equals("True"))
-                o.get().setLotation(o.get().getLotation()+1);
+        OccupancyHistory occupancyHistory = new OccupancyHistory();
+        OccupancyHistory.OccupancyHistoryId occupancyHistoryId =  occupancyHistory.new OccupancyHistoryId();
+        occupancyHistoryId.setPark(park.getParkById(parkID));
+        occupancyHistory.setId(occupancyHistoryId);
+        occupancyHistory.setUser(park.getUserById(Long.valueOf(json.get("vehicle").asText())));
+        occupancyHistory.setType(json.get("entering").asBoolean());
+        occupancyHistory.setDate(Long.valueOf(json.get("ts").asText()));
+        if (json.get("entering").asBoolean()==true){
+            o.setLotation(o.getLotation()+1);
+            occupancyHistory.setLotation(o.getLotation()+1);
         }
+        else{
+            o.setLotation(o.getLotation()-1);
+            occupancyHistory.setLotation(o.getLotation()-1);
+        }
+        park.updateOccupancy(o);
+        park.createParkMovement(occupancyHistory);
+        
 
     }
     
@@ -95,7 +108,7 @@ public class EventConsumer {
         Long parkID=Long.valueOf(json.get("park").asText());
         Long sensorID=Long.valueOf(json.get("sensor").asText());
         int temperature= (int)Math.floor(Double.parseDouble(json.get("temperature").asText()));
-        if (temperature>1){
+        if (temperature>35){
             Alert newAlert=new Alert();
             newAlert.setText("High temperature! Currently at "+temperature+"! Top limit is 35ºC.");
             newAlert.setDate(System.currentTimeMillis());

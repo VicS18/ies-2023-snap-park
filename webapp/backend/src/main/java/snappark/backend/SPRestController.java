@@ -8,6 +8,7 @@ import snappark.backend.entity.Park;
 import snappark.backend.entity.User;
 import snappark.backend.service.ParkService;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -85,11 +86,61 @@ public class SPRestController {
         return new ResponseEntity<List<OccupancyHistory>>(movements, HttpStatus.OK);
     }
 
-    @GetMapping("/parks/{parkId}/occupancies")
-    public ResponseEntity<List<OccupancyHistory>> getOccupancies(@PathVariable Long parkId){
-        // TODO: all
-        List<OccupancyHistory> movements = parkService.getParkMovements(parkId);
-        return new ResponseEntity<List<OccupancyHistory>>(movements, HttpStatus.OK);
+    public class OccupancyRecord {
+        private Long date;
+        private int lotation;
+    
+        public OccupancyRecord(Long date, int lotation) {
+            this.date = date;
+            this.lotation = lotation;
+        }
+    
+        public Long getDate() {
+            return date;
+        }
+    
+        public int getLotation() {
+            return lotation;
+        }
+        //make sure this class is properly serialized for front-end... maybe not needed
+        @Override
+        public String toString() {
+            return "OccupancyRecord{" +
+                    "date=" + date +
+                    ", lotation=" + lotation +
+                    '}';
+    }
+    }
+
+    @GetMapping("/parks/{parkId}/occupancies/{startDate}/{finishDate}/{numPoints}")
+    public ResponseEntity<List<OccupancyRecord>> getOccupancies(@PathVariable Long parkId, @PathVariable Long startDate, @PathVariable Long finishDate, @PathVariable int numPoints){
+        //start and finish date must be in timestamp
+        List<OccupancyHistory> movements = parkService.getParkMovementsByDate(parkId,startDate,finishDate);
+        ArrayList<OccupancyRecord> points= new ArrayList<OccupancyRecord>();
+
+        Long interval=(finishDate-startDate)/(numPoints-1); //Equal division of time to obtain numPoint-1 intervals
+        Long ts=interval+startDate; //current timestamp\\
+        for (int i=1;i<movements.size();i++) {
+            if (movements.get(i).getDate()>ts){
+                OccupancyHistory previous=movements.get(i-1);
+                OccupancyRecord newPoint= new OccupancyRecord(ts, previous.getLotation());
+                points.add(newPoint);
+                ts+=interval;
+            }    
+        }
+        if (points.size()==0)
+            for(int x=0;x<numPoints-points.size();x++){
+                points.add(new OccupancyRecord(ts, 0));
+                ts+=interval;
+            }
+        else if (points.size()<numPoints){
+            OccupancyRecord lastPoint=points.get(points.size()-1);
+            for(int x=0;x<numPoints-points.size();x++){
+                points.add(new OccupancyRecord(ts, lastPoint.lotation));
+                ts+=interval;
+            }
+        }
+        return new ResponseEntity<List<OccupancyRecord>>(points, HttpStatus.OK);
     }
 
     // TODO: Consider using an @Entity for the return values of these two methods

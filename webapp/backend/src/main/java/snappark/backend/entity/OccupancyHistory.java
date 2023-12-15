@@ -33,6 +33,9 @@ public class OccupancyHistory {
     private Boolean type;
 
     @Column
+    private int lotation;
+
+    @Column
     private long date;
 
     @Embeddable

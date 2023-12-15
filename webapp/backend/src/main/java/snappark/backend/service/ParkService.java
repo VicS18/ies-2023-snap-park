@@ -24,13 +24,19 @@ public interface ParkService {
 
     void deletePark(Long parkId);
 
+    OccupancyHistory createParkMovement(OccupancyHistory movement);
+    
     List<OccupancyHistory> getParkMovements(Long parkId);
+
+    List<OccupancyHistory> getParkMovementsByDate(long parkId, long startDate, long endDate);
 
     List<Park> getParksByUsername(String username);
 
     Sensor getSensorById(Long id);
 
     User createUser(User user);
+
+    User getUserById(Long id);
 
     Occupancy createOccupancy(Occupancy occupancy);
    

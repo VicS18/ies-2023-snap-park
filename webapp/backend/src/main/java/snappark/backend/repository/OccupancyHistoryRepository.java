@@ -9,4 +9,5 @@ import snappark.backend.entity.OccupancyHistory.OccupancyHistoryId;;
 
 public interface OccupancyHistoryRepository extends JpaRepository<OccupancyHistory,OccupancyHistoryId>{
     List<OccupancyHistory> findById_ParkId(Long parkId);
+    List<OccupancyHistory> findByDateBetweenAndId_Park_IdOrderByDateAsc(Long parkId, Long startDate, Long endDate);
 }

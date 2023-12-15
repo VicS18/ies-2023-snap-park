@@ -101,6 +101,9 @@ public class ParkServiceImpl implements ParkService {
         Manager manager = new Manager(user, savedPark);
 
         Manager savedManager = managerRepository.save(manager);
+        
+        occupancyRepository.save(new Occupancy(park.getId(), 0, savedPark));
+
         return savedManager.getPark();
     }
 
@@ -143,8 +146,16 @@ public class ParkServiceImpl implements ParkService {
         return managers.stream().map(Manager::getPark).collect(Collectors.toList());
     }
 
+    public OccupancyHistory createParkMovement(OccupancyHistory movement){
+        return occupancyHistoryRepository.save(movement);
+    }
+
     public List<OccupancyHistory> getParkMovements(Long parkId){
         return occupancyHistoryRepository.findById_ParkId(parkId);
+    }
+
+    public List<OccupancyHistory> getParkMovementsByDate(long parkId, long startDate, long endDate){
+        return occupancyHistoryRepository.findByDateBetweenAndId_Park_IdOrderByDateAsc(parkId,startDate,endDate);
     }
 
     //
@@ -164,7 +175,9 @@ public class ParkServiceImpl implements ParkService {
     public User createUser(User user){
         return userRepository.save(user);
     }
-
+    public User getUserById(Long id){
+        return userRepository.findById(id).get();
+    }
     public User updateUser(User user){
         return userRepository.save(user);
     }
