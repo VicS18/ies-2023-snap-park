@@ -162,7 +162,7 @@
                             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <i class="fas fa-bell fa-fw"></i>
                             <!-- Counter - Alerts -->
-                            <span class="badge badge-danger badge-counter">3+</span>
+                            <span class="badge badge-danger badge-counter">{messages.length}</span>
                         </a>
                         <!-- Dropdown - Alerts -->
                         <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in"
@@ -170,39 +170,20 @@
                             <h6 class="dropdown-header">
                                 Alerts Center
                             </h6>
-                            <a class="dropdown-item d-flex align-items-center" href="#">
-                                <div class="mr-3">
-                                    <div class="icon-circle bg-primary">
-                                        <i class="fas fa-file-alt text-white"></i>
-                                    </div>
-                                </div>
-                                <div>
-                                    <div class="small text-gray-500">October 4, 2023</div>
-                                    <span class="font-weight-bold">A new monthly report is available!</span>
-                                </div>
-                            </a>
-                            <a class="dropdown-item d-flex align-items-center" href="#">
-                                <div class="mr-3">
-                                    <div class="icon-circle bg-success">
-                                        <i class="fas fa-donate text-white"></i>
-                                    </div>
-                                </div>
-                                <div>
-                                    <div class="small text-gray-500">October 3, 2023</div>
-                                    Today's revenue breakdown!
-                                </div>
-                            </a>
-                            <a class="dropdown-item d-flex align-items-center" href="#">
+                            
+                            {#each messages as message}
+                                <a class="dropdown-item d-flex align-items-center" href="#">
                                 <div class="mr-3">
                                     <div class="icon-circle bg-warning">
                                         <i class="fas fa-exclamation-triangle text-white"></i>
                                     </div>
                                 </div>
                                 <div>
-                                    <div class="small text-gray-500">September 22, 2023</div>
-                                    Air Quality Alert: Pollution levels in Park 3 are unusually high.
+                                    <div class="small text-gray-500">{message.date}</div>
+                                    {message.text}
                                 </div>
-                            </a>
+                                </a>
+                            {/each}
                             <a class="dropdown-item text-center small text-gray-500" href="#">Show All Alerts</a>
                         </div>
                     </li>
@@ -354,3 +335,48 @@
         </div>
     </div>
 </div>
+
+<script>
+    import { onMount, onDestroy } from 'svelte';
+    import * as Stomp from 'stompjs';
+    import SockJS from 'sockjs-client';
+    let messages=[];
+
+    const stompService = {
+        stompClient: null,
+        
+        connect: () => {
+            var socket = new SockJS("http://localhost:9090/ws");
+            var stompClient = Stomp.over(socket);
+            stompClient.connect({}, function(frame) {
+                console.log("Connected to WebSocket:", frame);
+
+                stompClient.subscribe('/alerts/'+"1", function(message) {
+                    console.log("Received message:", message.body);
+                    message=JSON.parse(message.body)
+                    const date = new Date(message.date);
+                    const formattedDate = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+                    const formattedTime = `${date.getHours()}:${(date.getMinutes() < 10 ? '0' : '') + date.getMinutes()}`;
+                    const formattedDateTime = `${formattedTime} ${formattedDate}`;
+                    message.date=formattedDateTime
+                    messages = [...messages, message];
+                });
+            });
+        },
+
+        disconnect: () => {
+            if (stompService.stompClient) {
+                stompService.stompClient.disconnect();
+            }
+        },
+    };
+
+    onMount(() => {
+        stompService.connect();
+    });
+
+    onDestroy(() => {
+        stompService.disconnect();
+    });
+</script>
+
