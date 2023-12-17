@@ -1,6 +1,7 @@
 
 package snappark.backend.service;
 
+import java.util.HashSet;
 import java.util.Optional;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,8 +13,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import snappark.backend.entity.AirQuality;
 import snappark.backend.entity.Alert;
 import snappark.backend.entity.Light;
+import snappark.backend.entity.Manager;
 import snappark.backend.entity.Occupancy;
+import snappark.backend.entity.Park;
+import snappark.backend.entity.Sensor;
 import snappark.backend.entity.Temperature;
+import snappark.backend.entity.User;
 
 @Service
 public class EventConsumer {
@@ -28,6 +33,18 @@ public class EventConsumer {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode jsonNode = objectMapper.readTree(message);
+
+            /*
+             * DEBUG: CREATE DEFAULT USER JOHN
+             * TODO: REMOVE
+             */
+
+            park.createUser(debugUser);
+
+            /*
+             * DEBUG OVER
+             */
+
             switch (jsonNode.get("type").asText()) {
                 case "TRF":
                     trafficEvent(jsonNode);
@@ -50,22 +67,104 @@ public class EventConsumer {
 
     }
 
+    //
+    // TODO: REMOVE
+    // DEBUG: Assumes a default user 
+    //
+
+    private String debugUsername = "John";
+    private Long debugUserId = Long.valueOf(1);
+    private User debugUser = new User(debugUserId, debugUsername, debugUsername, new HashSet<Manager>());
+
+    private Park debugPark(Long id){
+        // Creates a park, if it doesn't exist, with default values
+
+        Park p = park.getParkById(id); // TODO: Should be done with "exists" for greater performance
+        if(p == null)
+        {
+            p = new Park(id, "PARK_" + id, "ADDR_" + id, 10, 10, 10, 100, new HashSet<Manager>());
+            // In Debug Mode every park is associated to John
+            park.createPark(p, "John");
+        }
+        return p;
+    }
+
+    //
+    // TODO: STOP IGNORING VEHICLE IDs
+    // 
+
+    private void debugUser(Long id){
+        // Creates a user, if it doesn't exist, with default values
+
+        User usr = park.getUserById(id); // TODO: Should be using "exists" 
+        if(usr == null)
+        {
+            usr = new User(id, "USR_" + id, "USR_" + id, new HashSet<Manager>());
+            park.createUser(usr);
+        }
+    }
+
+    private void debugSensor(Long id, String type, Park p){
+        // Creates a sensor, if it doesn't exist, ASSUMING its respective park already exists
+        
+        Sensor sensor = park.getSensorById(id);
+        if(sensor == null)
+        {
+            sensor = new Sensor(id, type, "ADDR", p);
+            park.createSensor(sensor);
+        }
+    }
+
     private void trafficEvent(JsonNode json){
         Long parkID=Long.valueOf(json.get("park").asText());
+
+        // DEBUG
+        Park p = debugPark(parkID);
+        // END DEBUG
+
+        // TODO: CHECK IF PARK EXISTS
+
         Optional<Occupancy> o=park.getOccupancyByParkId(parkID);
-        //check if parks exists
+
+        //check if occupancy row for park exists
         if (o.isPresent())
         {
-            if (json.get("entering").asText().equals("True"))
-                o.get().setLotation(o.get().getLotation()+1);
+            if (json.get("entering").asText().equals("True")){
+                Occupancy occup = o.get();
+                occup.setLotation(occup.getLotation()+1);
+            }
+            else if (json.get("entering").asText().equals("False")){
+                Occupancy occup = o.get();
+                if(occup.getLotation() > 0)
+                    occup.setLotation(occup.getLotation() - 1);
+            }
         }
-
+        else // Create occupancy
+        {
+            Occupancy occup = new Occupancy(parkID, 0, p);
+            if (json.get("entering").asText().equals("True")){
+                occup.setLotation(1);
+            }
+            park.createOccupancy(occup);
+        }
     }
     
 
     private void lightEvent(JsonNode json){
         Long parkID=Long.valueOf(json.get("park").asText());
+
+        // Verify park existence
+
+        //
+        // DEBUG: INSERT PARK AND SENSOR IF THEY DON'T EXIST 
+        // TODO: REMOVE THIS
+        //
+        Park p = debugPark(parkID);
+
         Long sensorID=Long.valueOf(json.get("sensor").asText());
+
+        debugSensor(sensorID, "LGT", p);
+
         int intensity= (int)Math.floor(Double.parseDouble(json.get("intensity").asText()));
 
         if (intensity>1500){
@@ -93,7 +192,17 @@ public class EventConsumer {
 
     private void temperatureEvent(JsonNode json){
         Long parkID=Long.valueOf(json.get("park").asText());
+
+        //
+        // DEBUG: INSERT IF PARK DOESN'T EXIST 
+        // TODO: REMOVE
+        //
+        Park p = debugPark(parkID);
+
         Long sensorID=Long.valueOf(json.get("sensor").asText());
+
+        debugSensor(sensorID, "TMP", p);
+        
         int temperature= (int)Math.floor(Double.parseDouble(json.get("temperature").asText()));
         if (temperature>1){
             Alert newAlert=new Alert();
@@ -119,7 +228,17 @@ public class EventConsumer {
 
     private void airQualityEvent(JsonNode json){
         Long parkID=Long.valueOf(json.get("park").asText());
+
+        //
+        // DEBUG: INSERT IF PARK DOESN'T EXIST 
+        // TODO: REMOVE
+        //
+        Park p = debugPark(parkID);
+
         Long sensorID=Long.valueOf(json.get("sensor").asText());
+
+        debugSensor(sensorID, "AQ", p);
+        
         int aq= Integer.parseInt(json.get("aqi").asText());
         if (aq >100){
             Alert newAlert=new Alert();

@@ -90,7 +90,6 @@ public class ParkServiceImpl implements ParkService {
         return parkRepository.findParkByName(name);    
     }
 
-    // Shouldn't receive Park object argument
     public Park createPark(Park park, String username){        
         // TODO: Deal with situation where provided userId doesn't have a corresponding User
         
@@ -156,6 +155,9 @@ public class ParkServiceImpl implements ParkService {
         return sensorRepository.findById(id).get();
     }
 
+    public Sensor createSensor(Sensor sensor){
+        return sensorRepository.save(sensor);
+    }
 
     //
     // User entity operations
@@ -168,6 +170,11 @@ public class ParkServiceImpl implements ParkService {
     public User updateUser(User user){
         return userRepository.save(user);
     }
+
+    public User getUserById(Long id){
+        return userRepository.findUserById(id);
+    }
+
     //
     // Occupancy entity operations
     //
