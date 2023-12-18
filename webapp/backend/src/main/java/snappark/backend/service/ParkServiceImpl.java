@@ -175,8 +175,8 @@ public class ParkServiceImpl implements ParkService {
     public User createUser(User user){
         return userRepository.save(user);
     }
-    public User getUserById(Long id){
-        return userRepository.findById(id).get();
+    public Optional<User> getUserById(Long id){
+        return userRepository.findById(id);
     }
     public User updateUser(User user){
         return userRepository.save(user);

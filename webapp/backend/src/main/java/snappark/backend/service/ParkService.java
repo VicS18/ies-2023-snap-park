@@ -36,7 +36,7 @@ public interface ParkService {
 
     User createUser(User user);
 
-    User getUserById(Long id);
+    Optional<User> getUserById(Long id);
 
     Occupancy createOccupancy(Occupancy occupancy);
    

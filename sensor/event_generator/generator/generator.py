@@ -79,10 +79,9 @@ class parkingState:
         self.initial_capacity = initial_capacity
 
         self.capacity = 0
-        self.cur_car_id = 0
+        self.cur_car_id = 2
         self.total_weigth = 0
         self.leavingOptions = []
-
 
     def start(self,ts):
         self.inPark = []

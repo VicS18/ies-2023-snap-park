@@ -1,6 +1,8 @@
 
 package snappark.backend.service;
 
+import java.util.Optional;
+
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,6 +16,7 @@ import snappark.backend.entity.Light;
 import snappark.backend.entity.Occupancy;
 import snappark.backend.entity.OccupancyHistory;
 import snappark.backend.entity.Temperature;
+import snappark.backend.entity.User;
 
 @Service
 public class EventConsumer {
@@ -55,7 +58,19 @@ public class EventConsumer {
         Occupancy o=park.getOccupancyByParkId(parkID).get();
         OccupancyHistory occupancyHistory = new OccupancyHistory();
         occupancyHistory.setPark(park.getParkById(parkID));
-        //occupancyHistory.setUser(park.getUserById(Long.valueOf(json.get("vehicle").asText())));
+        Optional<User> oUser=park.getUserById(Long.valueOf(json.get("vehicle").asText()));
+        User user;
+        if (oUser.isEmpty()){
+            user=new User();
+            user.setName("TestUser");
+            user.setPassword("1234");;
+            park.createUser(user);
+        }
+        
+        else{
+            user=oUser.get();
+        }
+        occupancyHistory.setUser(user);
         occupancyHistory.setType(Boolean.parseBoolean(json.get("entering").asText().toLowerCase()));
         occupancyHistory.setDate(Long.valueOf(json.get("ts").asText()));
         if (json.get("entering").asBoolean()==true){
