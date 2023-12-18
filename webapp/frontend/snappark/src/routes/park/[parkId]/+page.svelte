@@ -7,43 +7,66 @@
     let sensorCount = data.sensorCount.sensorCount;
     let annualRevenue = data.annualRevenue.annualRevenue;
     let monthlyRevenue = data.monthlyRevenue.monthlyRevenue;
-    let occupancies = data.occupancies;
+    let woccupancies = data.woccupancies;
+    let doccupancies = data.doccupancies;
+    let moccupancies = data.moccupancies;
 
-    const makeChartOccupation = (array) => {
-        let _labels = [];
-        let _data = [];
-        array.forEach((element) => {
-            var dateObject = new Date(element["date"]);
+        let chart;
 
-            var formattedDate = dateObject.toLocaleString();
+        const makeChartOccupation = (type) => {
+            let _labels = [];
+            let _data = [];
+            let array=[];
+            let title="";
 
-            _labels.push(formattedDate);
-            _data.push(element["lotation"]);
-        });
-        
-        return {
-            labels: _labels,
-            datasets: [
-                {
-                    label: "Park Occupation",
-                    data: _data,
-                    backgroundColor: "rgba(75, 192, 192, 0.2)",
-                    borderColor: "rgba(75, 192, 192, 1)",
-                    borderWidth: 1,
-                },
-            ],
+            if (type=="week"){
+                array=woccupancies
+                title="Last Week Occupation"
+            }
+            if (type=="month"){
+                array=moccupancies
+                title="Last Month Occupation"
+            }
+            if (type=="day"){
+                array=doccupancies
+                title="Last 24h Occupation"
+            }
+            array.forEach((element, index) => {
+                var dateObject = new Date(element["date"]);
+                var formattedDate = dateObject.toLocaleString();
+                _labels.push(formattedDate);
+                _data.push(element["lotation"]);
+            });
+
+            let charData={
+                labels: _labels,
+                datasets: [
+                    {
+                        label:title,
+                        data: _data,
+                        backgroundColor: "rgba(75, 192, 192, 0.2)",
+                        borderColor: "rgba(75, 192, 192, 1)",
+                        borderWidth: 1,
+                    },
+                ],
+            };
+            if  (!chart || !chart.config){
+                const canvas = document.getElementById('chartOccupation');
+                const ctx = canvas.getContext('2d');
+                chart=new Chart(ctx, {
+                    type: "line",
+                    data: charData,
+                });
+            }
+            else{
+                chart.data=charData;
+                chart.update() ;
+            }
         };
-    };
-    
-    let chart;
-    
-    onMount(() => {
-        const chartData = makeChartOccupation(occupancies);
-        new Chart(chart.getContext('2d'), {
-            type: "line",
-            data: chartData,
+        
+        onMount(() => {
+            makeChartOccupation("week");
         });
-    });
 </script>
 
 <!-- Page Heading -->
@@ -184,9 +207,11 @@
             <!-- Card Header - Dropdown -->
             <div
                 class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                <a class="nav-link" href="park1.html">
-                    <h6 class="m-0 font-weight-bold text-primary">Park Occupancy</h6>
-                </a>
+                <h6 class="m-0 font-weight-bold text-primary">Park Occupancy</h6>
+                <button type="button" class="btn btn-primary" on:click={() => makeChartOccupation("day")}>Day</button>
+                <button type="button" class="btn btn-primary" on:click={() => makeChartOccupation("week")}>Week</button>
+                <button type="button" class="btn btn-primary" on:click={() => makeChartOccupation("month")}>Month</button>
+
             </div>
             <!-- Card Body -->
             <div class="card-body">

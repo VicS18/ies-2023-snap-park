@@ -3,6 +3,7 @@ package snappark.backend;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.AllArgsConstructor;
+import snappark.backend.entity.Occupancy;
 import snappark.backend.entity.OccupancyHistory;
 import snappark.backend.entity.Park;
 import snappark.backend.entity.User;
@@ -125,19 +126,22 @@ public class SPRestController {
                 OccupancyHistory previous=movements.get(i-1);
                 OccupancyRecord newPoint= new OccupancyRecord(ts, previous.getLotation());
                 points.add(newPoint);
+                ts+=interval;
                 if(points.size()==numPoints)
                     break;
-                ts+=interval;
+                i-=1;
             }    
         }
-        if (points.size()==0)
+        if (points.size()==0){
+            Occupancy currentOccupancy=parkService.getOccupancyByParkId(parkId).get();
             for(int x=0;x<numPoints;x++){
-                points.add(new OccupancyRecord(ts, 0));
+                points.add(new OccupancyRecord(ts, currentOccupancy.getLotation()));
                 ts+=interval;
             }
+        }
         else if (points.size()<numPoints){
             OccupancyRecord lastPoint=points.get(points.size()-1);
-            for(int x=0;x<numPoints-points.size();x++){
+            for(int x=0;x<(numPoints-points.size());x++){
                 points.add(new OccupancyRecord(ts, lastPoint.getLotation()));
                 ts+=interval;
             }
