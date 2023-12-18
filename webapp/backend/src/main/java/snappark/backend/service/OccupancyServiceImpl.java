@@ -12,7 +12,7 @@ import snappark.backend.repository.OccupancyRepository;
 public class OccupancyServiceImpl implements OccupancyService {
     private OccupancyRepository occupancies;
     public Occupancy getOccupancy(Long parkId){ 
-        return occupancies.findById(parkId).orElse(null);    
+        return occupancies.findByParkId(parkId).orElse(null);    
     }
 
     public Occupancy createOccupancy(Occupancy Occupancy){
@@ -20,7 +20,7 @@ public class OccupancyServiceImpl implements OccupancyService {
     };
 
     public Occupancy updateOccupancy(Long parkID, int change) {
-        Optional<Occupancy> optionalOccupancy = occupancies.findById(parkID);
+        Optional<Occupancy> optionalOccupancy = occupancies.findByParkId(parkID);
 
         if (optionalOccupancy.isPresent()) {
             Occupancy occupancy = optionalOccupancy.get();
