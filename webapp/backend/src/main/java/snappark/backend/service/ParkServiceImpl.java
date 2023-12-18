@@ -180,7 +180,16 @@ public class ParkServiceImpl implements ParkService {
         return foundSensor.isPresent() ? foundSensor.get() : null;
     }
 
+    // Prefer second method.
+
     public Sensor createSensor(Sensor sensor){
+        return sensorRepository.save(sensor);
+    }
+
+    // TODO: Check if park exists
+
+    public Sensor createSensor(Sensor sensor, Long parkId){
+        sensor.setPark(getParkById(parkId));
         return sensorRepository.save(sensor);
     }
 

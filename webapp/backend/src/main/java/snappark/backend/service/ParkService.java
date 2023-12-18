@@ -37,6 +37,8 @@ public interface ParkService {
 
     Sensor createSensor(Sensor sensor);
 
+    Sensor createSensor(Sensor sensor, Long parkId);
+
     //
     // User operations
     //

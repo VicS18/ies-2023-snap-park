@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.RestController;
 import lombok.AllArgsConstructor;
 import snappark.backend.entity.OccupancyHistory;
 import snappark.backend.entity.Park;
+import snappark.backend.entity.Sensor;
 import snappark.backend.entity.User;
 import snappark.backend.service.ParkService;
 
@@ -84,6 +85,12 @@ public class SPRestController {
     // 
     // Park-Event operations
     //
+
+    @PostMapping("/parks/{parkId}/sensors")
+    public ResponseEntity<Sensor> postSensor(@RequestBody Sensor sensor, @PathVariable Long parkId){
+        Sensor savedSensor = parkService.createSensor(sensor, parkId);
+        return new ResponseEntity<Sensor>(savedSensor, HttpStatus.OK);
+    }
 
     @GetMapping("/parks/{parkId}/movements")
     public ResponseEntity<List<OccupancyHistory>> getMovements(@PathVariable Long parkId){
