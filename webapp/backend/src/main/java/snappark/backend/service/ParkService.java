@@ -41,6 +41,8 @@ public interface ParkService {
 
     Sensor getSensorById(Long id);
 
+    List<Sensor> getSensorsByParkId(Long parkId);
+
     Sensor createSensor(Sensor sensor);
 
     Sensor createSensor(Sensor sensor, Long parkId);

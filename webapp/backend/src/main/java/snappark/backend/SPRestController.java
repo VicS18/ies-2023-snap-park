@@ -85,15 +85,27 @@ public class SPRestController {
         return HttpStatus.OK;
     }
 
-    // 
-    // Park-Event operations
+    //
+    // Sensor operations
     //
 
     @PostMapping("/parks/{parkId}/sensors")
     public ResponseEntity<Sensor> postSensor(@RequestBody Sensor sensor, @PathVariable Long parkId){
+        // TODO: Handle Park not found
         Sensor savedSensor = parkService.createSensor(sensor, parkId);
         return new ResponseEntity<Sensor>(savedSensor, HttpStatus.OK);
     }
+
+    @GetMapping("/parks/{parkId}/sensors")
+    public ResponseEntity<List<Sensor>> getMethodName(@PathVariable Long parkId) {
+        // TODO: Handle Park not found
+        List<Sensor> parkSensors = parkService.getSensorsByParkId(parkId);
+        return new ResponseEntity<List<Sensor>>(parkSensors, HttpStatus.OK);
+    }
+    
+    // 
+    // Park-Event operations
+    //
 
     @GetMapping("/parks/{parkId}/movements")
     public ResponseEntity<List<OccupancyHistory>> getMovements(@PathVariable Long parkId){

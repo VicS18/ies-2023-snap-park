@@ -11,5 +11,5 @@ public interface SensorRepository extends JpaRepository<Sensor,Long>{
     
     Integer countByPark(Park park);
 
-    List<Sensor> findByPark(Park park);
+    List<Sensor> findByParkId(Long id);
 }
