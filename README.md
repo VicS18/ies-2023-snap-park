@@ -22,3 +22,6 @@ https://github.com/VicS18/ies-2023-snap-park
 ### Project Backlog
 
 https://snappark.atlassian.net/jira/software/projects/SNAP/boards/1/backlog?epics=visible
+
+## Note 
+Diogo Marto - my pc broke down so im using my brothers pc , despite using my git account on his pc some commits magicly appear in his name so commits associated with Kikomachado089 are from me.  
