@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import snappark.backend.entity.AirQuality;
+import snappark.backend.entity.AirQualityHistory;
 import snappark.backend.entity.Alert;
 import snappark.backend.entity.Light;
 import snappark.backend.entity.Occupancy;
@@ -11,6 +12,7 @@ import snappark.backend.entity.OccupancyHistory;
 import snappark.backend.entity.Park;
 import snappark.backend.entity.Sensor;
 import snappark.backend.entity.Temperature;
+import snappark.backend.entity.Transaction;
 import snappark.backend.entity.User;
 
 public interface ParkService {
@@ -29,7 +31,11 @@ public interface ParkService {
 
     void deletePark(Long parkId);
 
+    OccupancyHistory createParkMovement(OccupancyHistory movement);
+    
     List<OccupancyHistory> getParkMovements(Long parkId);
+
+    List<OccupancyHistory> getParkMovementsByDate(long parkId, long startDate, long endDate);
 
     List<Park> getParksByUsername(String username);
 
@@ -45,7 +51,8 @@ public interface ParkService {
 
     User createUser(User user);
 
-    User getUserById(Long id);
+    Optional<User> getUserById(Long id);
+
 
     Occupancy createOccupancy(Occupancy occupancy);
    
@@ -61,6 +68,8 @@ public interface ParkService {
 
     Light createLight(Light Light);
 
+    Transaction createTransaction(Transaction transaction);
+    
     // Aggregations
 
     Double getAvgLightLevel(Long parkId);
@@ -78,8 +87,14 @@ public interface ParkService {
     Light updateLight(Light Light);
 
     AirQuality createAirQuality(AirQuality airQuality);
+    
+    AirQualityHistory createAirQualityHistory(AirQualityHistory airQuality);
 
     Optional<AirQuality> getAirQualityByParkAndSensor(Long parkID, Long SensorID);
+    
+    List<Sensor> getSensorsByPark(Long parkID);
+
+    List<AirQualityHistory> getAirQualityByDate(long parkId, long sensorId, long startDate, long endDate);
 
     AirQuality updateAirQuality(AirQuality airQuality);
 

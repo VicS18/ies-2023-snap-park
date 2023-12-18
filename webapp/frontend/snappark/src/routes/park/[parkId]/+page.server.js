@@ -37,15 +37,27 @@ export async function load({ params }) {
 
     const sensorCount = await fetch('http://app:9090/api/v1/parks/' + params.parkId + '/sensorCount');
 
-    const annualRevenue = await fetch('http://app:9090/api/v1/parks/' + params.parkId + '/revenue/annual');
+    const currDate = new Date().getTime()
 
+    const nwoccupancies = await fetch('http://app:9090/api/v1/parks/' + params.parkId + '/occupancies/' + (currDate - (86400000 * 7)) + '/' + currDate + '/' + 64);
+    const ndoccupancies = await fetch('http://app:9090/api/v1/parks/' + params.parkId + '/occupancies/' + (currDate - (86400000 * 1)) + '/' + currDate + '/' + 64);
+    const nmoccupancies = await fetch('http://app:9090/api/v1/parks/' + params.parkId + '/occupancies/' + (currDate - (86400000 * 30)) + '/' + currDate + '/' + 64);
+
+    const ndairqualities = await fetch('http://app:9090/api/v1/parks/' + params.parkId + '/airqualities/' + (currDate - (86400000 * 1)) + '/' + currDate + '/' + 24);
+
+    const annualRevenue = await fetch('http://app:9090/api/v1/parks/' + params.parkId + '/revenue/annual');
     const monthlyRevenue = await fetch('http://app:9090/api/v1/parks/' + params.parkId + '/revenue/monthly');
 
-	return {
+    return {
         park: parkGeneral.json(),
         avgLight: avgLight.json(),
         sensorCount: sensorCount.json(),
         annualRevenue: annualRevenue.json(),
-        monthlyRevenue: monthlyRevenue.json()
-	};
+        monthlyRevenue: monthlyRevenue.json(),
+        woccupancies: nwoccupancies.json(),
+        doccupancies: ndoccupancies.json(),
+        moccupancies: nmoccupancies.json(),
+        dairqualities: ndairqualities.json()
+
+    };
 }

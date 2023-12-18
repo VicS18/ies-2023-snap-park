@@ -79,10 +79,9 @@ class parkingState:
         self.initial_capacity = initial_capacity
 
         self.capacity = 0
-        self.cur_car_id = 0
+        self.cur_car_id = 2
         self.total_weigth = 0
         self.leavingOptions = []
-
 
     def start(self,ts):
         self.inPark = []
@@ -206,7 +205,7 @@ class ligthGen:
         start_ts = ( time_lower // ( 1000 * self.sampling_rate ) ) *  ( 1000 * self.sampling_rate )
 
         sampling_times = [ start_ts + e * self.sampling_rate
-                          for e in range(samples) ]
+                          for e in range(int(samples)) ]
         
         events = []
         for ts in sampling_times:
@@ -316,14 +315,15 @@ class airGen:
                             })
         return events
 
-p = parkingState(initial_capacity=50)    
+p = parkingState(initial_capacity=45)    
 l = ligthState()
 t = temperatureState()
 a = airState()
+samplingRate=1000
 m_gens = [ movementsGen(i,p) for i in range(1,3) ]
-l_gens = [ ligthGen(100,l,10,1),ligthGen(101,l,10,0.2),ligthGen(102,l,10,0,10e2)  ]
-t_gens = [ temperatureGen(200,t,10,1,14),temperatureGen(201,t,10,0.1,18) ]
-a_gens = [ airGen(300,a,10,1,0,0),airGen(301,a,10,0.5,15,6),airGen(302,a,10,0.1,30,2) ]
+l_gens = [ ligthGen(100,l,samplingRate,1),ligthGen(101,l,samplingRate,0.2),ligthGen(102,l,samplingRate,10e2,0)  ]
+t_gens = [ temperatureGen(200,t,samplingRate,1,14),temperatureGen(201,t,samplingRate,0.1,18) ]
+a_gens = [ airGen(300,a,samplingRate,1,0,0),airGen(301,a,samplingRate,0.5,15,6),airGen(302,a,samplingRate,0.1,30,2) ]
 gens = m_gens + l_gens + t_gens + a_gens
 gen = eventGen(1,10,gens,[p,l,t,a]) # timescale around sampling rate is good ( 10 )
 gen.start()
@@ -332,11 +332,15 @@ QUEUE_NAME = 'snap_park'
 HOST = 'localhost'
 
 def main():
+    global gen
     connection = pika.BlockingConnection(
     pika.ConnectionParameters(host=HOST))
-
+    gen.initial_time = 1701949480000 #1700316280000 #start sim time
+    gen.prevtime=gen.initial_time
+    gen.curtime=gen.prevtime + 600 * 1000
+    endTime=1702908280000 #time to finish simulation
     try:
-        while True:
+        while gen.curtime<endTime:
             update(QUEUE_NAME, connection)
     finally:
         connection.close()
@@ -344,7 +348,8 @@ def main():
 
 def update(queue_name, conn):   
     global gen 
-    time.sleep(1)
+    
+    #time.sleep(1)
     print("\033c", end='')
     print("Time now:" , gen.prevtime )
     events = gen.getEvents()
@@ -352,10 +357,10 @@ def update(queue_name, conn):
     print(" Num of cars: ",len(p.inPark))
     print( [ car[0] for car in p.inPark] )
     l_events = [ event.get("intensity") for event in events if event.get("intensity") ]
-    print(" Ligth avg: " , sum(l_events)/len(l_events) )
+    #print(" Ligth avg: " , sum(l_events)/len(l_events) )
     print(l_events)
     t_events = [ event.get("temperature") for event in events if event.get("temperature") ]
-    print(" Temperature avg: " , sum(t_events)/len(t_events) )
+    #print(" Temperature avg: " , sum(t_events)/len(t_events) )
     print(t_events)
     print("Events: ")
     print( "    Leaving: " , [ event.get("vehicle") for event in events if event.get("entering") == False] )
@@ -364,7 +369,8 @@ def update(queue_name, conn):
 
     channel = conn.channel()
     channel.queue_declare(queue=queue_name, durable=True)
-
+    step = 3600 #1 hour at a time
+    gen.curtime = gen.prevtime + step * 1000
     for event in events:
         channel.basic_publish(exchange='', routing_key=queue_name, body=json.dumps(event))
 

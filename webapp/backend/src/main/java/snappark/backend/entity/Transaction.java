@@ -5,7 +5,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,18 +21,14 @@ public class Transaction{
     @GeneratedValue(strategy=GenerationType.SEQUENCE)
     private Long id;
     
-    @ManyToOne
-    @JoinColumn(name = "entrance_park_id", referencedColumnName = "park_id")
-    @JoinColumn(name = "entrance_id", referencedColumnName = "id")
-    private OccupancyHistory entrance;
+    @ManyToOne 
+    private Park park;
 
     @ManyToOne
-    @JoinColumn(name = "exit_park_id", referencedColumnName = "park_id")
-    @JoinColumn(name = "exit_id", referencedColumnName = "id")
-    private OccupancyHistory exit;
+    private User user;
 
     @Column
-    private Long timestamp;
+    private Long date;
 
     @Column
     private Double profit;

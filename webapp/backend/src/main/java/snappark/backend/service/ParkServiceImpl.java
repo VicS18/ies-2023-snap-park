@@ -22,10 +22,13 @@ import snappark.backend.entity.OccupancyHistory;
 import snappark.backend.entity.Park;
 import snappark.backend.entity.Sensor;
 import snappark.backend.entity.Temperature;
+import snappark.backend.entity.Transaction;
 import snappark.backend.entity.User;
 import snappark.backend.entity.AirQuality.AirQualityId;
+import snappark.backend.entity.AirQualityHistory;
 import snappark.backend.entity.Light.LightId;
 import snappark.backend.entity.Temperature.TemperatureId;
+import snappark.backend.repository.AirQualityHistoryRepository;
 import snappark.backend.repository.AirQualityRepository;
 import snappark.backend.repository.LightRepository;
 import snappark.backend.repository.ManagerRepository;
@@ -70,6 +73,9 @@ public class ParkServiceImpl implements ParkService {
     private AirQualityRepository airQualityRepository;    
 
     @Autowired(required = true)
+    private AirQualityHistoryRepository airQualityHistoryRepository;   
+
+    @Autowired(required = true)
     private OccupancyHistoryRepository occupancyHistoryRepository;
 
     @Autowired(required = true)
@@ -97,26 +103,13 @@ public class ParkServiceImpl implements ParkService {
         
         Park savedPark = parkRepository.save(park);
 
-        System.out.println("C_DEBUG_SAVED_PARK: " + savedPark);
-
         User user = userRepository.findUserByName(username);
-
-        System.out.println("C_DEBUG_USER: " + user);
 
         Manager manager = new Manager(user, savedPark);
 
-        System.out.println("C_DEBUG_MANAGER: " + manager.getPark() + "; " + manager.getUser());
-
         Manager savedManager = managerRepository.save(manager);
-
-        System.out.println("C_DEBUG_SAVED_MANAGER: " + manager.getPark() + "; " + manager.getUser());
-
-        System.out.println("C_DEBUG_PARKS: " + managerRepository.findByUserName(username));
-
-        for(Manager m : managerRepository.findByUserName(username))
-        {
-            System.out.println("CDM_PARK: " + m.getPark() + "; USER: " + m.getUser());
-        }
+        
+        occupancyRepository.save(new Occupancy(park.getId(), 0, savedPark));
 
         return savedManager.getPark();
     }
@@ -136,19 +129,20 @@ public class ParkServiceImpl implements ParkService {
         return sensorRepository.countByPark(park);
     }
 
-    // TODO: Generalize to monthly revenue as well
 
     public Double getAnnualRevenue(Long parkId){
-        // TODO: Check if park exists
-
-        // 1st of January of next year to the current year
-        return transactionRepository.sumByParkIdTime(parkId, getCurrYearStart(), getNextYearStart());
-    }
+        double sum=0;
+        for(Transaction t: transactionRepository.findByDateBetweenAndParkOrderByDateAsc(getCurrMonthStart(), getNextMonthStart(),parkRepository.findParkById(parkId))){
+            sum+=t.getProfit();
+        }
+        return sum;    }
 
     public Double getMonthlyRevenue(Long parkId){
-        // TODO: Check if park exists
-
-        return transactionRepository.sumByParkIdTime(parkId, getCurrMonthStart(), getNextMonthStart());
+        double sum=0;
+        for(Transaction t: transactionRepository.findByDateBetweenAndParkOrderByDateAsc(getCurrMonthStart(), getNextMonthStart(),parkRepository.findParkById(parkId))){
+            sum+=t.getProfit();
+        }
+        return sum;
     }
 
     //
@@ -166,19 +160,30 @@ public class ParkServiceImpl implements ParkService {
         return managers.stream().map(Manager::getPark).collect(Collectors.toList());
     }
 
+    public OccupancyHistory createParkMovement(OccupancyHistory movement){
+        return occupancyHistoryRepository.save(movement);
+    }
+
     public List<OccupancyHistory> getParkMovements(Long parkId){
-        return occupancyHistoryRepository.findById_ParkId(parkId);
+        return occupancyHistoryRepository.findByPark(parkRepository.findParkById(parkId));
+    }
+
+    public List<OccupancyHistory> getParkMovementsByDate(long parkId, long startDate, long endDate){
+        Park fPark=parkRepository.findParkById(parkId);
+        return occupancyHistoryRepository.findByDateBetweenAndParkOrderByDateAsc(startDate,endDate,fPark);
     }
 
     //
     // Sensor entity operations
     //
 
-
     public Sensor getSensorById(Long id){
         Optional<Sensor> foundSensor = sensorRepository.findById(id);
         return foundSensor.isPresent() ? foundSensor.get() : null;
     }
+
+    public List<Sensor> getSensorsByPark(Long parkID){
+        return sensorRepository.findByPark(parkRepository.findParkById(parkID));
 
     // Prefer second method.
 
@@ -200,7 +205,9 @@ public class ParkServiceImpl implements ParkService {
     public User createUser(User user){
         return userRepository.save(user);
     }
-
+    public Optional<User> getUserById(Long id){
+        return userRepository.findById(id);
+    }
     public User updateUser(User user){
         return userRepository.save(user);
     }
@@ -226,6 +233,11 @@ public class ParkServiceImpl implements ParkService {
         return occupancyRepository.save(occupancy);
     }   
 
+    public Transaction createTransaction(Transaction transaction){
+        return transactionRepository.save(transaction);
+    }
+
+ 
     //
     // Temperature entity operations
     //
@@ -273,7 +285,10 @@ public class ParkServiceImpl implements ParkService {
     public AirQuality createAirQuality(AirQuality airQuality){
         return airQualityRepository.save(airQuality);
     }
-    
+    public AirQualityHistory createAirQualityHistory(AirQualityHistory airQuality){
+        return airQualityHistoryRepository.save(airQuality);
+    }
+
     public Optional<AirQuality> getAirQualityByParkAndSensor(Long parkId, Long sensorId){
         Park park=parkRepository.findParkById(parkId);
         Sensor sensor=sensorRepository.findById(sensorId).get();
@@ -282,51 +297,83 @@ public class ParkServiceImpl implements ParkService {
         return airQualityRepository.findById(temp);
     }
 
+    public List<AirQualityHistory> getAirQualityByDate(long parkId, long sensorId, long startDate, long endDate){
+        Park fPark=parkRepository.findParkById(parkId);
+        Sensor fSensor=sensorRepository.findById(sensorId).get();
+        return airQualityHistoryRepository.findByDateBetweenAndParkAndSensorOrderByDateAsc(startDate,endDate,fPark, fSensor);
+    }
+
     public AirQuality updateAirQuality(AirQuality airQuality){
         return airQualityRepository.save(airQuality);
     }
 
-    public static Long getNextYearStart(){
+    public static Long getNextYearStart() {
+        Date date = new Date();
+        Calendar calendar = new GregorianCalendar();
+        calendar.setTime(date);
+
+        // Set the day of the month to 1
+        calendar.set(Calendar.DAY_OF_MONTH, 1);
+
+        // Set the next year
+        calendar.add(Calendar.YEAR, 1);
+
+        // Set the time components to 0 to get the start of the day
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+
+        return calendar.getTimeInMillis();
+    }
+
+    public static Long getNextMonthStart() {
+        Date date = new Date();
+        Calendar calendar = new GregorianCalendar();
+        calendar.setTime(date);
+
+        // Set the day of the month to 1
+        calendar.set(Calendar.DAY_OF_MONTH, 1);
+
+        // Set the next month
+        calendar.add(Calendar.MONTH, 1);
+
+        // Set the time components to 0 to get the start of the day
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+
+        return calendar.getTimeInMillis();
+    }
+
+    public static Long getCurrMonthStart() {
+        Date date = new Date();
+        Calendar calendar = new GregorianCalendar();
+        calendar.setTime(date);
+
+        // Set the day of the month to 1
+        calendar.set(Calendar.DAY_OF_MONTH, 1);
+
+        // Set the time components to 0 to get the start of the day
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+
+        return calendar.getTimeInMillis();
+    }
+
+    public static Long getCurrYearStart() {
         Date date = new Date();
         Calendar calendar = new GregorianCalendar();
         calendar.setTime(date);
         int currYear = calendar.get(Calendar.YEAR);
 
-        calendar.set(currYear - 1901, 1, 1);
-        
-        return calendar.getTimeInMillis();
-    }
+        // Correct the month setting to be Calendar.JANUARY (0-based index)
+        calendar.set(currYear, Calendar.JANUARY, 1, 0, 0, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
 
-    public static Long getNextMonthStart(){
-        Date date = new Date();
-        Calendar calendar = new GregorianCalendar();
-        calendar.setTime(date);
-        int currMonth = calendar.get(Calendar.MONTH);
-
-        calendar.set(calendar.get(Calendar.YEAR), currMonth, 1);
-        
-        return calendar.getTimeInMillis();
-    }
-
-    public static Long getCurrMonthStart(){
-        Date date = new Date();
-        Calendar calendar = new GregorianCalendar();
-        calendar.setTime(date);
-        int currMonth = calendar.get(Calendar.MONTH);
-
-        calendar.set(calendar.get(Calendar.YEAR), currMonth - 1, 1);
-        
-        return calendar.getTimeInMillis();
-    }
-
-    public static Long getCurrYearStart(){
-        Date date = new Date();
-        Calendar calendar = new GregorianCalendar();
-        calendar.setTime(date);
-        int currYear = calendar.get(Calendar.YEAR);
-
-        calendar.set(currYear - 1900, 1, 1);
-        
         return calendar.getTimeInMillis();
     }
 

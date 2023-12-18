@@ -1,16 +1,12 @@
 package snappark.backend.entity;
 
-import java.io.Serializable;
-
 import jakarta.persistence.Column;
-import jakarta.persistence.Embeddable;
-import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,32 +19,22 @@ import lombok.Setter;
 @Entity
 public class AirQualityHistory {
 
-    @EmbeddedId
-    private AirQualityHistoryId id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    private Long id;
 
     @Column
     private int humidity;
 
     @Column
     private long date;
-
-    @Embeddable
-    @Getter
-    @Setter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public class AirQualityHistoryId implements Serializable{
-
-        @ManyToOne
-        @JoinColumn(name="park_id")
-        private Park park;
-        
-        @OneToOne
-        @JoinColumn(name="sensor_id")
-        private Sensor sensor;
-
-        @GeneratedValue(strategy = GenerationType.SEQUENCE)
-        private Long id;
-    }
+    
+    @ManyToOne
+    @JoinColumn(name="park_id", unique = false)
+    private Park park;
+    
+    @ManyToOne
+    @JoinColumn(name="sensor_id", unique = false)
+    private Sensor sensor;
 
 }

@@ -3,12 +3,15 @@ package snappark.backend;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.AllArgsConstructor;
+import snappark.backend.entity.AirQualityHistory;
+import snappark.backend.entity.Occupancy;
 import snappark.backend.entity.OccupancyHistory;
 import snappark.backend.entity.Park;
 import snappark.backend.entity.Sensor;
 import snappark.backend.entity.User;
 import snappark.backend.service.ParkService;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -100,6 +103,126 @@ public class SPRestController {
         return new ResponseEntity<List<OccupancyHistory>>(movements, HttpStatus.OK);
     }
 
+    public class OccupancyRecord {
+        private Long date;
+        private int lotation;
+    
+        public OccupancyRecord(Long date, int lotation) {
+            this.date = date;
+            this.lotation = lotation;
+        }
+    
+        public Long getDate() {
+            return date;
+        }
+    
+        public int getLotation() {
+            return lotation;
+        }
+
+        public void setLotation(int lotation) {
+            this.lotation=lotation;
+        }
+        //make sure this class is properly serialized for front-end... maybe not needed
+        @Override
+        public String toString() {
+            return "OccupancyRecord{" +
+                    "date=" + date +
+                    ", lotation=" + lotation +
+                    '}';
+    }
+    }
+
+    @GetMapping("/parks/{parkId}/occupancies/{startDate}/{finishDate}/{numPoints}")
+    public ResponseEntity<List<OccupancyRecord>> getOccupancies(@PathVariable Long parkId, @PathVariable Long startDate, @PathVariable Long finishDate, @PathVariable int numPoints){
+        //start and finish date must be in timestamp
+        List<OccupancyHistory> movements = parkService.getParkMovementsByDate(parkId,startDate,finishDate);
+        ArrayList<OccupancyRecord> points= new ArrayList<OccupancyRecord>();
+
+        Long interval=(finishDate-startDate)/(numPoints-1); //Equal division of time to obtain numPoint-1 intervals
+        Long ts=startDate; //current timestamp\\
+        for (int i=1;i<movements.size();i++) {
+            if (movements.get(i).getDate()>ts){
+                OccupancyHistory previous=movements.get(i-1);
+                OccupancyRecord newPoint= new OccupancyRecord(ts, previous.getLotation());
+                points.add(newPoint);
+                ts+=interval;
+                if(points.size()==numPoints)
+                    break;
+                i-=1;
+            }    
+        }
+        if (points.size()==0){
+            Occupancy currentOccupancy=parkService.getOccupancyByParkId(parkId).get();
+            for(int x=0;x<numPoints;x++){
+                points.add(new OccupancyRecord(ts, currentOccupancy.getLotation()));
+                ts+=interval;
+            }
+        }
+        else if (points.size()<numPoints){
+            OccupancyRecord lastPoint=points.get(points.size()-1);
+            for(int x=0;x<(numPoints-points.size());x++){
+                points.add(new OccupancyRecord(ts, lastPoint.getLotation()));
+                ts+=interval;
+            }
+        }
+        return new ResponseEntity<List<OccupancyRecord>>(points, HttpStatus.OK);
+    }
+
+    @GetMapping("/parks/{parkId}/airqualities/{startDate}/{finishDate}/{numPoints}")
+    public ResponseEntity<List<OccupancyRecord>> getAirQualities(@PathVariable Long parkId, @PathVariable Long startDate, @PathVariable Long finishDate, @PathVariable int numPoints){
+        //start and finish date must be in timestamp
+        ArrayList<OccupancyRecord> points= new ArrayList<OccupancyRecord>();
+        List<Sensor> sensors=parkService.getSensorsByPark(parkId);
+        Long interval=(finishDate-startDate)/(numPoints-1); //Equal division of time to obtain numPoint-1 intervals
+        Long ts=startDate; //current timestamp\\
+        ArrayList<Sensor> aqSensors=new ArrayList<Sensor>();
+        for (Sensor s:sensors){
+            if (s.getType().equals("AQ"))
+                aqSensors.add(s);
+        }
+        for (Sensor s:aqSensors){
+            List<AirQualityHistory> movements = parkService.getAirQualityByDate(parkId,s.getId(),startDate,finishDate);
+            int counter = 0;
+            for (int i=1;i<movements.size();i++) {
+                if (movements.get(i).getDate()>ts){
+                    AirQualityHistory previous=movements.get(i-1);
+                    OccupancyRecord newPoint= new OccupancyRecord(ts, previous.getHumidity());
+                    if (points.size()>counter){
+                        newPoint.setLotation(newPoint.getLotation()+points.get(counter).getLotation());
+                        points.set(counter, newPoint);
+                    }
+                    else
+                        points.add(newPoint);
+                    ts+=interval;
+                    if(points.size()==numPoints)
+                        break;
+                    i--;
+                    counter++;
+                }    
+            }
+            if (points.size()==0){
+                Occupancy currentOccupancy=parkService.getOccupancyByParkId(parkId).get();
+                for(int x=0;x<numPoints;x++){
+                    points.add(new OccupancyRecord(ts, currentOccupancy.getLotation()));
+                    ts+=interval;
+                }
+            }
+            else if (points.size()<numPoints){
+                OccupancyRecord lastPoint=points.get(points.size()-1);
+                for(int x=0;x<(numPoints-points.size());x++){
+                    points.add(new OccupancyRecord(ts, lastPoint.getLotation()));
+                    ts+=interval;
+                }
+            }
+        }
+        for (int i=0; i<points.size(); i++){ //do average of sensors
+            OccupancyRecord record=points.get(i);
+            record.setLotation(record.getLotation()/aqSensors.size());
+            points.set(i, record);
+        }
+        return new ResponseEntity<List<OccupancyRecord>>(points, HttpStatus.OK);
+    }
     // TODO: Consider using an @Entity for the return values of these two methods
 
     @GetMapping("/parks/{parkId}/avgLight")
