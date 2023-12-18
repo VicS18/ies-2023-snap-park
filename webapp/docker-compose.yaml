@@ -6,6 +6,8 @@ services:
     ports:
       - "5672:5672"
       - "15672:15672"
+    networks:
+      - my_network
 
   cockroachdb:
     image: "cockroachdb/cockroach:v23.1.12"
@@ -19,6 +21,9 @@ services:
       - "8080:8080"
     volumes:
       - roach-single:/cockroach/cockroach-data
+    networks:
+      - my_network
+
   app:
     depends_on:
       - rabbitmq
@@ -34,17 +39,36 @@ services:
         "spring.datasource.username" : "$COCKROACH_USER",
         "spring.datasource.password" : "$COCKROACH_PASSWORD",
         "spring.jpa.properties.hibernate.dialect" : "org.hibernate.dialect.PostgreSQLDialect",
-        "spring.jpa.hibernate.ddl-auto" : "update"
-      }'
+        "spring.jpa.hibernate.ddl-auto" : "update"}'
     volumes:
       - .m2:/root/.m2
     stdin_open: true
     tty: true
+    networks:
+      - my_network
     
   sveltekit:
     build: ./frontend/snappark
     ports:
       - "5000:5000"
+    networks:
+      - my_network
+
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - app
+      - sveltekit
+    networks:
+      - my_network
   
 volumes:
   roach-single:
+
+networks:
+  my_network:
+    driver: bridge
