@@ -1,8 +1,8 @@
 <!-- Page Heading -->
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
     <h1 class="h3 mb-0 text-gray-800">{data.park.name}</h1>
-    <a href="/" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" data-toggle="modal" data-target="#addSensorModal"><i
-        class="fas fa-plus fa-sm text-white-50"></i> Add Sensor </a>
+    <button class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" data-toggle="modal" data-target="#addSensorModal"><i
+        class="fas fa-plus fa-sm text-white-50"></i> Add Sensor </button>
     <a href="/" class="d-none d-sm-inline-block btn btn-sm btn-danger shadow-sm" data-toggle="modal" data-target="#remParkModal"><i
             class="fas fa-trash fa-sm text-white-50"></i> Remove Park </a>
     
@@ -304,6 +304,41 @@
             </div>
         </div>
 
+    </div>
+</div>
+
+<!--Add Sensor Modal-->
+<div class="modal fade" id="addSensorModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form id="addSensor" method="POST" action="?/createSensor">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Give us info about the sensor!</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">x</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group row">
+                        <label for="name" class="col-sm-2 col-form-label">Type</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" name="type" placeholder="" required>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="address" class="col-sm-2 col-form-label">Address</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" name="address" placeholder="" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add</button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 

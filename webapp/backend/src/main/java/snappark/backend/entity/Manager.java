@@ -1,6 +1,7 @@
 package snappark.backend.entity;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
 import jakarta.persistence.JoinColumn;
@@ -24,11 +25,13 @@ import lombok.ToString;
 public class Manager{
 
     @Id
+    // @ManyToOne(fetch = FetchType.EAGER)
     @ManyToOne
     @JoinColumn(name="user_id", referencedColumnName = "id")
     User user;
 
     @Id
+    // @ManyToOne(fetch = FetchType.EAGER)
     @ManyToOne
     @JoinColumn(name="park_id", referencedColumnName = "id")
     Park park;
