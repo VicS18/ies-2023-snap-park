@@ -1,8 +1,8 @@
-console.log("Y");
+import { redirect } from '@sveltejs/kit';
 
 /** @type {import('./$types').Actions} */
 export const actions = {
-    create: async({ request }) => {
+    register: async({ request }) => {
         // TODO: Refactor to take in username of requester.
 
         const formData = await request.formData();
@@ -10,7 +10,7 @@ export const actions = {
         const formJson = Object.fromEntries(formData.entries());
 
         // TODO: Migrate REST API address to the lib directory
-        const response = await fetch('http://app:9090/api/v1/parks/manager/John', {
+        const response = await fetch('http://app:9090/api/v1/users', {
             method: 'POST',
             body: JSON.stringify(formJson),
             headers: {
@@ -18,18 +18,17 @@ export const actions = {
             }
         });
 
-        return { success: true };
+        const responseJson = await response.json();
+
+        console.log("RESPONSE: ");
+        console.log(responseJson);
+
+        // I don't like this
+        throw redirect(301, '/dashboard/' + responseJson.id);
+
+        // return { success: true };
     }
 };
 
-/** @type {import('./$types').PageLoad} */
-export async function load() {
-    // TODO: Refactor to load specified client's parks
 
-    // Fetch manager user's parks
 
-    const response = await fetch('http://app:9090/api/v1/parks/manager/John');
-    return {
-        parks: response.json()
-    };
-}
