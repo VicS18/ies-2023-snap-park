@@ -9,8 +9,8 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import snappark.backend.entity.AirQuality;
@@ -22,10 +22,13 @@ import snappark.backend.entity.OccupancyHistory;
 import snappark.backend.entity.Park;
 import snappark.backend.entity.Sensor;
 import snappark.backend.entity.Temperature;
+import snappark.backend.entity.Transaction;
 import snappark.backend.entity.User;
 import snappark.backend.entity.AirQuality.AirQualityId;
+import snappark.backend.entity.AirQualityHistory;
 import snappark.backend.entity.Light.LightId;
 import snappark.backend.entity.Temperature.TemperatureId;
+import snappark.backend.repository.AirQualityHistoryRepository;
 import snappark.backend.repository.AirQualityRepository;
 import snappark.backend.repository.LightRepository;
 import snappark.backend.repository.ManagerRepository;
@@ -68,6 +71,9 @@ public class ParkServiceImpl implements ParkService {
 
     @Autowired(required = true)
     private AirQualityRepository airQualityRepository;    
+
+    @Autowired(required = true)
+    private AirQualityHistoryRepository airQualityHistoryRepository;   
 
     @Autowired(required = true)
     private OccupancyHistoryRepository occupancyHistoryRepository;
@@ -122,19 +128,20 @@ public class ParkServiceImpl implements ParkService {
         return sensorRepository.countByPark(park);
     }
 
-    // TODO: Generalize to monthly revenue as well
 
     public Double getAnnualRevenue(Long parkId){
-        // TODO: Check if park exists
-
-        // 1st of January of next year to the current year
-        return transactionRepository.sumByParkIdTime(parkId, getCurrYearStart(), getNextYearStart());
-    }
+        double sum=0;
+        for(Transaction t: transactionRepository.findByDateBetweenAndParkOrderByDateAsc(getCurrMonthStart(), getNextMonthStart(),parkRepository.findParkById(parkId))){
+            sum+=t.getProfit();
+        }
+        return sum;    }
 
     public Double getMonthlyRevenue(Long parkId){
-        // TODO: Check if park exists
-
-        return transactionRepository.sumByParkIdTime(parkId, getCurrMonthStart(), getNextMonthStart());
+        double sum=0;
+        for(Transaction t: transactionRepository.findByDateBetweenAndParkOrderByDateAsc(getCurrMonthStart(), getNextMonthStart(),parkRepository.findParkById(parkId))){
+            sum+=t.getProfit();
+        }
+        return sum;
     }
 
     //
@@ -167,6 +174,9 @@ public class ParkServiceImpl implements ParkService {
         return sensorRepository.findById(id).get();
     }
 
+    public List<Sensor> getSensorsByPark(Long parkID){
+        return sensorRepository.findByPark(parkRepository.findParkById(parkID));
+    }
 
     //
     // User entity operations
@@ -196,6 +206,11 @@ public class ParkServiceImpl implements ParkService {
         return occupancyRepository.save(occupancy);
     }   
 
+    public Transaction createTransaction(Transaction transaction){
+        return transactionRepository.save(transaction);
+    }
+
+ 
     //
     // Temperature entity operations
     //
@@ -243,7 +258,10 @@ public class ParkServiceImpl implements ParkService {
     public AirQuality createAirQuality(AirQuality airQuality){
         return airQualityRepository.save(airQuality);
     }
-    
+    public AirQualityHistory createAirQualityHistory(AirQualityHistory airQuality){
+        return airQualityHistoryRepository.save(airQuality);
+    }
+
     public Optional<AirQuality> getAirQualityByParkAndSensor(Long parkId, Long sensorId){
         Park park=parkRepository.findParkById(parkId);
         Sensor sensor=sensorRepository.findById(sensorId).get();
@@ -252,51 +270,83 @@ public class ParkServiceImpl implements ParkService {
         return airQualityRepository.findById(temp);
     }
 
+    public List<AirQualityHistory> getAirQualityByDate(long parkId, long sensorId, long startDate, long endDate){
+        Park fPark=parkRepository.findParkById(parkId);
+        Sensor fSensor=sensorRepository.findById(sensorId).get();
+        return airQualityHistoryRepository.findByDateBetweenAndParkAndSensorOrderByDateAsc(startDate,endDate,fPark, fSensor);
+    }
+
     public AirQuality updateAirQuality(AirQuality airQuality){
         return airQualityRepository.save(airQuality);
     }
 
-    public static Long getNextYearStart(){
+    public static Long getNextYearStart() {
+        Date date = new Date();
+        Calendar calendar = new GregorianCalendar();
+        calendar.setTime(date);
+
+        // Set the day of the month to 1
+        calendar.set(Calendar.DAY_OF_MONTH, 1);
+
+        // Set the next year
+        calendar.add(Calendar.YEAR, 1);
+
+        // Set the time components to 0 to get the start of the day
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+
+        return calendar.getTimeInMillis();
+    }
+
+    public static Long getNextMonthStart() {
+        Date date = new Date();
+        Calendar calendar = new GregorianCalendar();
+        calendar.setTime(date);
+
+        // Set the day of the month to 1
+        calendar.set(Calendar.DAY_OF_MONTH, 1);
+
+        // Set the next month
+        calendar.add(Calendar.MONTH, 1);
+
+        // Set the time components to 0 to get the start of the day
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+
+        return calendar.getTimeInMillis();
+    }
+
+    public static Long getCurrMonthStart() {
+        Date date = new Date();
+        Calendar calendar = new GregorianCalendar();
+        calendar.setTime(date);
+
+        // Set the day of the month to 1
+        calendar.set(Calendar.DAY_OF_MONTH, 1);
+
+        // Set the time components to 0 to get the start of the day
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+
+        return calendar.getTimeInMillis();
+    }
+
+    public static Long getCurrYearStart() {
         Date date = new Date();
         Calendar calendar = new GregorianCalendar();
         calendar.setTime(date);
         int currYear = calendar.get(Calendar.YEAR);
 
-        calendar.set(currYear - 1901, 1, 1);
-        
-        return calendar.getTimeInMillis();
-    }
+        // Correct the month setting to be Calendar.JANUARY (0-based index)
+        calendar.set(currYear, Calendar.JANUARY, 1, 0, 0, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
 
-    public static Long getNextMonthStart(){
-        Date date = new Date();
-        Calendar calendar = new GregorianCalendar();
-        calendar.setTime(date);
-        int currMonth = calendar.get(Calendar.MONTH);
-
-        calendar.set(calendar.get(Calendar.YEAR), currMonth, 1);
-        
-        return calendar.getTimeInMillis();
-    }
-
-    public static Long getCurrMonthStart(){
-        Date date = new Date();
-        Calendar calendar = new GregorianCalendar();
-        calendar.setTime(date);
-        int currMonth = calendar.get(Calendar.MONTH);
-
-        calendar.set(calendar.get(Calendar.YEAR), currMonth - 1, 1);
-        
-        return calendar.getTimeInMillis();
-    }
-
-    public static Long getCurrYearStart(){
-        Date date = new Date();
-        Calendar calendar = new GregorianCalendar();
-        calendar.setTime(date);
-        int currYear = calendar.get(Calendar.YEAR);
-
-        calendar.set(currYear - 1900, 1, 1);
-        
         return calendar.getTimeInMillis();
     }
 

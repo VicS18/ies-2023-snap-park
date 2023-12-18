@@ -20,6 +20,8 @@ export async function load({ params }) {
     const ndoccupancies = await fetch('http://app:9090/api/v1/parks/' + params.parkId + '/occupancies/' + (currDate - (86400000 * 1)) + '/' + currDate + '/' + 64);
     const nmoccupancies = await fetch('http://app:9090/api/v1/parks/' + params.parkId + '/occupancies/' + (currDate - (86400000 * 30)) + '/' + currDate + '/' + 64);
 
+    const ndairqualities = await fetch('http://app:9090/api/v1/parks/' + params.parkId + '/airqualities/' + (currDate - (86400000 * 1)) + '/' + currDate + '/' + 24);
+
     const annualRevenue = await fetch('http://app:9090/api/v1/parks/' + params.parkId + '/revenue/annual');
     const monthlyRevenue = await fetch('http://app:9090/api/v1/parks/' + params.parkId + '/revenue/monthly');
 
@@ -31,7 +33,8 @@ export async function load({ params }) {
         monthlyRevenue: monthlyRevenue.json(),
         woccupancies: nwoccupancies.json(),
         doccupancies: ndoccupancies.json(),
-        moccupancies: nmoccupancies.json()
+        moccupancies: nmoccupancies.json(),
+        dairqualities: ndairqualities.json()
 
     };
 }

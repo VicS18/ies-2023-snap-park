@@ -11,11 +11,13 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import snappark.backend.entity.AirQuality;
+import snappark.backend.entity.AirQualityHistory;
 import snappark.backend.entity.Alert;
 import snappark.backend.entity.Light;
 import snappark.backend.entity.Occupancy;
 import snappark.backend.entity.OccupancyHistory;
 import snappark.backend.entity.Temperature;
+import snappark.backend.entity.Transaction;
 import snappark.backend.entity.User;
 
 @Service
@@ -66,7 +68,7 @@ public class EventConsumer {
             user.setPassword("1234");;
             park.createUser(user);
         }
-        
+
         else{
             user=oUser.get();
         }
@@ -83,6 +85,14 @@ public class EventConsumer {
         }
         park.updateOccupancy(o);
         park.createParkMovement(occupancyHistory);
+        if (occupancyHistory.getType()==false){
+            Transaction tran= new Transaction();
+            tran.setDate(occupancyHistory.getDate());
+            tran.setPark(occupancyHistory.getPark());
+            tran.setProfit(occupancyHistory.getPark().getEntranceFee());
+            tran.setUser(user);
+            park.createTransaction(tran);
+        }
         
 
     }
@@ -145,6 +155,7 @@ public class EventConsumer {
         Long parkID=Long.valueOf(json.get("park").asText());
         Long sensorID=Long.valueOf(json.get("sensor").asText());
         int aq= Integer.parseInt(json.get("aqi").asText());
+
         if (aq >100){
             Alert newAlert=new Alert();
             newAlert.setText("Bad air quality! Currently at "+ aq + "! Top limit is 100.");
@@ -154,6 +165,12 @@ public class EventConsumer {
             socket.sendNotification(newAlert);
         }
         AirQuality newAirQuality= new AirQuality(AirQuality.createAirQualityId(park.getParkById(parkID), park.getSensorById(sensorID)),aq); 
+        AirQualityHistory registry= new AirQualityHistory();
+        registry.setDate(Long.valueOf(json.get("ts").asText()));
+        registry.setHumidity(aq);
+        registry.setPark(park.getParkById(parkID));
+        registry.setSensor(park.getSensorById(sensorID));
+        park.createAirQualityHistory(registry);
         park.updateAirQuality(newAirQuality);
     }
 }

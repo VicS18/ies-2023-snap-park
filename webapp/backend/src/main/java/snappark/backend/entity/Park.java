@@ -43,7 +43,7 @@ public class Park {
     private float longitude;
 
     @Column(nullable = false)
-    private float entranceFee;
+    private double entranceFee;
 
     @Column
     private int maxLotation;

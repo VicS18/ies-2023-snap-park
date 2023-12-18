@@ -335,7 +335,7 @@ def main():
     global gen
     connection = pika.BlockingConnection(
     pika.ConnectionParameters(host=HOST))
-    gen.initial_time = 1702813480000 #1700316280000 #start sim time
+    gen.initial_time = 1701949480000 #1700316280000 #start sim time
     gen.prevtime=gen.initial_time
     gen.curtime=gen.prevtime + 600 * 1000
     endTime=1702908280000 #time to finish simulation

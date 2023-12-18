@@ -10,6 +10,8 @@
     let woccupancies = data.woccupancies;
     let doccupancies = data.doccupancies;
     let moccupancies = data.moccupancies;
+    let dairqualities = data.dairqualities;
+
 
         let chart;
 
@@ -63,9 +65,72 @@
                 chart.update() ;
             }
         };
+
+        let chart2;
+
+        const makeChartAQ = () => {
+            let _labels = [];
+            let _data = [];
+            let array=[];
+            let title="Last 24h average Air Quality";
+
+            array=dairqualities
+           
+            array.forEach((element, index) => {
+                var dateObject = new Date(element["date"]);
+                var formattedDate = dateObject.toLocaleString();
+                _labels.push(formattedDate);
+                _data.push(element["lotation"]);
+            });
+
+            let charData={
+                labels: _labels,
+                datasets: [
+                    {
+                        label:title,
+                        data: _data,
+                        backgroundColor: "rgba(75, 192, 192, 0.2)",
+                        borderColor: "rgba(75, 192, 192, 1)",
+                        borderWidth: 1,
+                    },
+                ],
+            };
+            if  (!chart2 || !chart2.config){
+                const canvas = document.getElementById('chartAQ');
+                const ctx = canvas.getContext('2d');
+                chart2=new Chart(ctx, {
+                    type: "line",
+                    data: charData,
+                    options: {
+                        tooltips: {
+                            callbacks: {
+                                title: function (tooltipItem, data) {
+                                    // Display only the x-value as the tooltip title
+                                    return data.labels[tooltipItem[0].index];
+                                },
+                                label: function (tooltipItem, data) {
+                                    // Return an empty string to hide the default tooltip label
+                                    return '';
+                                }
+                            },
+                            displayColors: false,
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleFontSize: 12,
+                            titleFontColor: '#fff',
+                            bodyFontColor: '#fff'
+                        },
+                    },
+                });
+            }
+            else{
+                chart2.data=charData;
+                chart2.update() ;
+            }
+        };
         
         onMount(() => {
             makeChartOccupation("week");
+            makeChartAQ();
         });
 </script>
 
@@ -208,13 +273,13 @@
             <div
                 class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                 <h6 class="m-0 font-weight-bold text-primary">Park Occupancy</h6>
-                <button type="button" class="btn btn-primary" on:click={() => makeChartOccupation("day")}>Day</button>
-                <button type="button" class="btn btn-primary" on:click={() => makeChartOccupation("week")}>Week</button>
-                <button type="button" class="btn btn-primary" on:click={() => makeChartOccupation("month")}>Month</button>
-
+                <button type="button" class="btn btn-primary m-2" on:click={() => makeChartOccupation("day")}>Day</button>
+                <button type="button" class="btn btn-primary m-2" on:click={() => makeChartOccupation("week")}>Week</button>
+                <button type="button" class="btn btn-primary m-2" on:click={() => makeChartOccupation("month")}>Month</button>
             </div>
             <!-- Card Body -->
             <div class="card-body">
+                
                 <div class="chart-area">
                     <canvas id="chartOccupation" bind:this={chart}></canvas>
                 </div>
@@ -229,7 +294,7 @@
             <div
                 class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                 <a class="nav-link" href="park1.html">
-                    <h6 class="m-0 font-weight-bold text-primary">Air Quality (%)</h6>
+                    <h6 class="m-0 font-weight-bold text-primary">Air Quality</h6>
                 </a>
                 <div class="dropdown no-arrow">
                     <a class="dropdown-toggle" href="/" role="button" id="dropdownMenuLink"
@@ -248,20 +313,10 @@
             </div>
             <!-- Card Body -->
             <div class="card-body">
-                <div class="chart-pie pt-4 pb-2">
-                    <canvas id="myPieChart"></canvas>
+                <div class="chart-area" style="margin: 0">
+                    <canvas id="chartAQ" bind:this={chart2}></canvas>
                 </div>
-                <div class="mt-4 text-center small">
-                    <span class="mr-2">
-                        <i class="fas fa-circle text-primary"></i> Oxygen
-                    </span>
-                    <span class="mr-2">
-                        <i class="fas fa-circle text-success"></i> CO2
-                    </span>
-                    <span class="mr-2">
-                        <i class="fas fa-circle text-info"></i> Nitrogen
-                    </span>
-                </div>
+                
             </div>
         </div>
     </div>
