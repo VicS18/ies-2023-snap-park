@@ -457,11 +457,3 @@
     </div>
 </div>
 
-<script>
-    export let data;
-    let avgLight = data.avgLight.avgLight;
-    let sensorCount = data.sensorCount.sensorCount;
-    let annualRevenue = data.annualRevenue.annualRevenue;
-    let monthlyRevenue = data.monthlyRevenue.monthlyRevenue;
-</script>
-

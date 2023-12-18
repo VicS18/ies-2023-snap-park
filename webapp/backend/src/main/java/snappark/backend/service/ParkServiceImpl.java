@@ -109,7 +109,7 @@ public class ParkServiceImpl implements ParkService {
 
         Manager savedManager = managerRepository.save(manager);
         
-        occupancyRepository.save(new Occupancy(park.getId(), 0, savedPark));
+        occupancyRepository.save(new Occupancy(park.getId(), savedPark, 0));
 
         return savedManager.getPark();
     }
@@ -184,6 +184,7 @@ public class ParkServiceImpl implements ParkService {
 
     public List<Sensor> getSensorsByPark(Long parkID){
         return sensorRepository.findByPark(parkRepository.findParkById(parkID));
+    }
 
     // Prefer second method.
 
@@ -212,11 +213,13 @@ public class ParkServiceImpl implements ParkService {
         return userRepository.save(user);
     }
 
+    /*
     // TODO: ...Should just return an Optional object
     public User getUserById(Long id){
         Optional<User> foundUsr = userRepository.findUserById(id);
         return foundUsr.isPresent() ? foundUsr.get() : null;
     }
+    */
 
     //
     // Occupancy entity operations
