@@ -185,7 +185,7 @@ public class SPRestController {
     public ResponseEntity<List<OccupancyRecord>> getAirQualities(@PathVariable Long parkId, @PathVariable Long startDate, @PathVariable Long finishDate, @PathVariable int numPoints){
         //start and finish date must be in timestamp
         ArrayList<OccupancyRecord> points= new ArrayList<OccupancyRecord>();
-        List<Sensor> sensors=parkService.getSensorsByPark(parkId);
+        List<Sensor> sensors=parkService.getSensorsByParkId(parkId);
         Long interval=(finishDate-startDate)/(numPoints-1); //Equal division of time to obtain numPoint-1 intervals
         Long ts=startDate; //current timestamp\\
         ArrayList<Sensor> aqSensors=new ArrayList<Sensor>();

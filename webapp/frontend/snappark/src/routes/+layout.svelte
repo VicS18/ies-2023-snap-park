@@ -33,17 +33,19 @@
 
         <!-- Nav Item - Pages Collapse Menu -->
         <li class="nav-item">
-            <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo"
+            <a class="nav-link collapsed" href="/sensors/John" data-toggle="collapse" data-target="#collapseTwo"
                 aria-expanded="true" aria-controls="collapseTwo">
                 <i class="fas fa-fw fa-cog"></i>
                 <span>Sensors</span>
             </a>
+            <!--
             <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
                 <div class="bg-white py-2 collapse-inner rounded">
                     <a class="collapse-item" href="sensors.html">View Sensors</a>
                     <a class="collapse-item" href="" data-toggle="modal" data-target="#addSensorModal">Add Sensor</a>
                 </div>
             </div>
+            -->
         </li>
 
         <!-- Nav Item - Utilities Collapse Menu -->

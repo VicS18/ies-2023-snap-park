@@ -94,8 +94,6 @@ public interface ParkService {
 
     Optional<AirQuality> getAirQualityByParkAndSensor(Long parkID, Long SensorID);
     
-    List<Sensor> getSensorsByPark(Long parkID);
-
     List<AirQualityHistory> getAirQualityByDate(long parkId, long sensorId, long startDate, long endDate);
 
     AirQuality updateAirQuality(AirQuality airQuality);

@@ -182,8 +182,8 @@ public class ParkServiceImpl implements ParkService {
         return foundSensor.isPresent() ? foundSensor.get() : null;
     }
 
-    public List<Sensor> getSensorsByPark(Long parkID){
-        return sensorRepository.findByPark(parkRepository.findParkById(parkID));
+    public List<Sensor> getSensorsByParkId(Long parkID){
+        return sensorRepository.findByParkId(parkID);
     }
 
     // Prefer second method.
