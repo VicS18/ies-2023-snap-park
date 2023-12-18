@@ -5,6 +5,7 @@ import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -48,7 +49,7 @@ public class Park {
     @Column
     private int maxLotation;
 
-    @OneToMany(mappedBy = "park")
+    @OneToMany(mappedBy = "park", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     Set<Manager> managers = new HashSet<Manager>();
 }

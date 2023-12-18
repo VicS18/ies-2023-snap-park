@@ -8,6 +8,7 @@ import snappark.backend.entity.Alert;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
+// @Transactional
 public class WebSocketService {
     @Autowired
     private SimpMessagingTemplate messagingTemplate;

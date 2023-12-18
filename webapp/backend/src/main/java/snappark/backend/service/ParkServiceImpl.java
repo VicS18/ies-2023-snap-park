@@ -89,14 +89,15 @@ public class ParkServiceImpl implements ParkService {
     // 
     
     public Park getParkById(Long id){
-        return parkRepository.findParkById(id);
+        Optional<Park> foundPark = parkRepository.findById(id);
+        return foundPark.isPresent() ? foundPark.get() : null;
     }
     
     public Park getParkByName(String name){
-        return parkRepository.findParkByName(name);    
+        Optional<Park> foundPark = parkRepository.findParkByName(name);
+        return foundPark.isPresent() ? foundPark.get() : null;    
     }
 
-    // Shouldn't receive Park object argument
     public Park createPark(Park park, String username){        
         // TODO: Deal with situation where provided userId doesn't have a corresponding User
         
@@ -150,6 +151,12 @@ public class ParkServiceImpl implements ParkService {
 
     public List<Park> getParksByUsername(String username){
         List<Manager> managers = managerRepository.findByUserName(username);
+        System.out.println("==== D_PM_MANAGERS: " + managerRepository.findByUserName(username));
+
+        for(Manager m : managers)
+        {
+            System.out.println("==== D_PM_PARK: " + m.getPark() + "; USER: " + m.getUser());
+        }
         return managers.stream().map(Manager::getPark).collect(Collectors.toList());
     }
 
@@ -171,11 +178,24 @@ public class ParkServiceImpl implements ParkService {
     //
 
     public Sensor getSensorById(Long id){
-        return sensorRepository.findById(id).get();
+        Optional<Sensor> foundSensor = sensorRepository.findById(id);
+        return foundSensor.isPresent() ? foundSensor.get() : null;
     }
 
     public List<Sensor> getSensorsByPark(Long parkID){
         return sensorRepository.findByPark(parkRepository.findParkById(parkID));
+
+    // Prefer second method.
+
+    public Sensor createSensor(Sensor sensor){
+        return sensorRepository.save(sensor);
+    }
+
+    // TODO: Check if park exists
+
+    public Sensor createSensor(Sensor sensor, Long parkId){
+        sensor.setPark(getParkById(parkId));
+        return sensorRepository.save(sensor);
     }
 
     //
@@ -191,6 +211,13 @@ public class ParkServiceImpl implements ParkService {
     public User updateUser(User user){
         return userRepository.save(user);
     }
+
+    // TODO: ...Should just return an Optional object
+    public User getUserById(Long id){
+        Optional<User> foundUsr = userRepository.findUserById(id);
+        return foundUsr.isPresent() ? foundUsr.get() : null;
+    }
+
     //
     // Occupancy entity operations
     //
@@ -199,7 +226,7 @@ public class ParkServiceImpl implements ParkService {
     }
     
     public Optional<Occupancy> getOccupancyByParkId(Long id){
-        return occupancyRepository.findById(id);
+        return occupancyRepository.findByParkId(id);
     }
 
     public Occupancy updateOccupancy(Occupancy occupancy){

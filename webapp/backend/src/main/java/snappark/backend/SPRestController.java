@@ -41,7 +41,11 @@ public class SPRestController {
     @GetMapping("/parks/manager/{username}")
     public ResponseEntity<List<Park>> getParksByUser(@PathVariable String username, @RequestParam(required = false) Long id, @RequestParam(required = false) String name){
         // TODO: Handle case where username isn't provided or doesn't exist
+        System.out.println("==== GET /parks/manager/{username}");
         List<Park> retPark = parkService.getParksByUsername(username);
+
+        System.out.println("==== GM_USERNAME: " + username);
+        System.out.println("==== GM_RETPARK: " + retPark);
 
         if(id != null); // TODO: FILTER BY ID 
         if(name != null); // TODO: FILTER BY NAME
@@ -51,7 +55,11 @@ public class SPRestController {
 
     @PostMapping("/parks/manager/{username}")
     public ResponseEntity<Park> postPark(@RequestBody Park park, @PathVariable String username){
+        System.out.println("==== POST /parks/manager/{username}");
+        System.out.println("==== PM_PARK: " + park);
+        System.out.println("==== PM_USERNAME: " + username);
         Park savedPark = parkService.createPark(park, username);
+        System.out.println("==== PM_SAVED_PARK: " + savedPark);
         // TODO: Handle case where username doesn't correspond to existing User (in Managers)
 
         return new ResponseEntity<Park>(savedPark, HttpStatus.CREATED);
@@ -80,6 +88,12 @@ public class SPRestController {
     // 
     // Park-Event operations
     //
+
+    @PostMapping("/parks/{parkId}/sensors")
+    public ResponseEntity<Sensor> postSensor(@RequestBody Sensor sensor, @PathVariable Long parkId){
+        Sensor savedSensor = parkService.createSensor(sensor, parkId);
+        return new ResponseEntity<Sensor>(savedSensor, HttpStatus.OK);
+    }
 
     @GetMapping("/parks/{parkId}/movements")
     public ResponseEntity<List<OccupancyHistory>> getMovements(@PathVariable Long parkId){
