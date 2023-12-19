@@ -18,9 +18,9 @@
 
         <!-- Nav Item - Dashboard -->
         <li class="nav-item active">
-            <a class="nav-link" href="parks.html">
-                <i class="fas fa-fw fa-car-alt"></i>
-                <span>Your Parks</span></a>
+            <a class="nav-link" href="/">
+                <i class="fa-solid fa-house"></i>
+                <span>Home</span></a>
         </li>
 
         <!-- Divider -->
@@ -31,27 +31,13 @@
             Utility
         </div>
 
-        <!-- Nav Item - Pages Collapse Menu -->
-        <li class="nav-item">
-            <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo"
-                aria-expanded="true" aria-controls="collapseTwo">
-                <i class="fas fa-fw fa-cog"></i>
-                <span>Sensors</span>
-            </a>
-            <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                <div class="bg-white py-2 collapse-inner rounded">
-                    <a class="collapse-item" href="sensors.html">View Sensors</a>
-                    <a class="collapse-item" href="" data-toggle="modal" data-target="#addSensorModal">Add Sensor</a>
-                </div>
-            </div>
-        </li>
 
         <!-- Nav Item - Utilities Collapse Menu -->
         <li class="nav-item">
             <!-- TODO: do this dynamic -->
-            <a class="nav-link collapsed" href="/parks/1" data-toggle="collapse" data-target="#collapseUtilities"
+            <a class="nav-link collapsed" href="/parks/{$userId}" data-toggle="collapse" data-target="#collapseUtilities"
                 aria-expanded="true" aria-controls="collapseUtilities">
-                <i class="fas fa-fw fa-wrench"></i>
+                <i class="fa-solid fa-square-parking"></i>
                 <span>Parks</span>
             </a>
         </li>
@@ -66,7 +52,7 @@
         </div>
         <!-- Nav Item - Pages Collapse Menu -->
         <li class="nav-item">
-            <a class="nav-link " href="revenue.html">
+            <a class="nav-link " href="#">
                 <i class="fas fa-fw fa-coins"></i>
                 <span>Revenue</span>
             </a>
@@ -245,8 +231,8 @@
                     <li class="nav-item dropdown no-arrow">
                         <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <span class="mr-2 d-none d-lg-inline text-gray-600 small">John</span>
-                            <img class="img-profile rounded-circle" src="img/undraw_profile.svg" alt="user-profile">
+                            <span class="mr-2 d-none d-lg-inline text-gray-600 small">Insert Name</span>
+                            <img class="img-profile rounded-circle" src="img/undraw_profile.svg" >
                         </a>
                         <!-- Dropdown - User Information -->
                         <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
@@ -264,7 +250,11 @@
                                 Activity Log
                             </a>
                             <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
+                            <a class="dropdown-item" id="loginBtn" href="#" data-toggle="modal" data-target="#loginModal">
+                                <i class="fas fa-sign-in-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                                Login
+                            </a>
+                            <a class="dropdown-item" id="logoutBtn" href="#" data-toggle="modal" data-target="#logoutModal">
                                 <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
                                 Logout
                             </a>
@@ -317,36 +307,75 @@
                 <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
                 <div class="modal-footer">
                     <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                    <a class="btn btn-primary" href="login.html">Logout</a>
+                    <button class="btn btn-primary" on:click={logout}>Logout</button>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Login Modal-->
+<div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+aria-hidden="true">
+<div class="modal-dialog" role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Login</h5>
+            <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">×</span>
+            </button>
+        </div>
+        <div class="modal-body">
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" class="form-control" id="username" placeholder="Enter your username">
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" class="form-control" id="password" placeholder="Enter your password">
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+            <button class="btn btn-primary" on:click={login}>Login</button>
+        </div>
+    </div>
+</div>
+</div>
+
 </div>
 
 <script>
     import { onMount, onDestroy } from 'svelte';
     import * as Stomp from 'stompjs';
     import SockJS from 'sockjs-client';
-    let messages=[];
+    import { userId } from '../stores/global';
+
+    let messages = [];
+    let currentUser;
+
+    userId.subscribe(value => {
+        currentUser = value;
+    });
 
     const stompService = {
         stompClient: null,
-        
+
         connect: () => {
             var socket = new SockJS("http://localhost:9090/ws");
             var stompClient = Stomp.over(socket);
-            stompClient.connect({}, function(frame) {
+            stompClient.connect({}, function (frame) {
                 console.log("Connected to WebSocket:", frame);
 
-                stompClient.subscribe('/alerts/'+"1", function(message) {
+                stompClient.subscribe('/alerts/' + "1", function (message) {
                     console.log("Received message:", message.body);
-                    message=JSON.parse(message.body)
+                    message = JSON.parse(message.body);
                     const date = new Date(message.date);
                     const formattedDate = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
                     const formattedTime = `${date.getHours()}:${(date.getMinutes() < 10 ? '0' : '') + date.getMinutes()}`;
                     const formattedDateTime = `${formattedTime} ${formattedDate}`;
-                    message.date=formattedDateTime
+                    message.date = formattedDateTime;
                     messages = [...messages, message];
                 });
             });
@@ -358,6 +387,43 @@
             }
         },
     };
+
+    async function login(user) {
+        try {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            // Assuming you have an authentication API endpoint
+            /*const response = await fetch('http://app:9090/api/v1/userAt', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ username, password }),
+            });
+            const data = await response.json();
+            if (!response.ok) {
+                throw new Error('Authentication failed');
+            }
+            */
+                
+            userId.set(username);
+            console.log('Login successful');
+            if ((typeof window !== 'undefined') && (window.location.pathname !== '/')) {
+                window.location.href = '/';
+            }  
+        } catch (error) {
+            console.error('Login error:', error);
+        }
+    }
+
+    function logout() {
+        userId.set(null);
+        console.log('Unauthentication successful');
+        // Check if running on the client side before using window.location.href
+        if ((typeof window !== 'undefined') && (window.location.pathname !== '/')) {
+                window.location.href = '/';
+        }  
+    }
 
     onMount(() => {
         stompService.connect();
