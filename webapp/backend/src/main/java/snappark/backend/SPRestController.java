@@ -283,10 +283,37 @@ public class SPRestController {
     //
     // User operations
     //
-
-    @PostMapping("/users")
-    public ResponseEntity<User> postUser(@RequestBody User user){
-        User savedUser = parkService.createUser(user);
+    public class UserForm {
+        private String name;
+        private String password;
+    
+        public String getName(){
+            return this.name;
+        }
+        public String getPassword(){
+            return this.password;
+        }
+    }
+    
+    @PostMapping("/user")
+    public ResponseEntity<User> postUser(@RequestBody UserForm user){
+        User usr= new User();
+        usr.setName(user.getName());
+        usr.setPassword(user.getPassword());
+        User savedUser = parkService.createUser(usr);
         return new ResponseEntity<User>(savedUser, HttpStatus.CREATED);
+    }
+    @PostMapping("/userAt")
+    public ResponseEntity<User> postUserAt(@RequestBody long id, String password){
+        Optional<User> savedUser = parkService.getUserById(id);
+        if (savedUser.isPresent()){
+            if (savedUser.get().getPassword().equals(password)){
+                return new ResponseEntity<User>(savedUser.get(), HttpStatus.FOUND);
+            }
+            else {
+                return new ResponseEntity<User>(HttpStatus.FORBIDDEN);
+            }
+        }
+        return new ResponseEntity<User>(HttpStatus.NOT_FOUND);
     }
 }

@@ -429,7 +429,7 @@
     aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <form id="addSensor" method="POST" action="?/createSensor">
+            <form id="addSensor" method="POST" action="/park/{data.park.id}/sensors">
                 <div class="modal-header">
                     <h5 class="modal-title" id="exampleModalLabel">Give us info about the sensor!</h5>
                     <button class="close" type="button" data-dismiss="modal" aria-label="Close">
