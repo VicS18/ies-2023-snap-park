@@ -1,4 +1,3 @@
-
 /** @type {import('./$types').Actions} */
 export const actions = {
     createSensor: async({ request, params }) => {
@@ -31,22 +30,22 @@ export async function load({ params }) {
 
     // NOTE: Javascript doesn't like null values when parsing JSON
 
-    const parkGeneral = await fetch('http://app:9090/api/v1/parks/' + params.parkId);
+    const parkGeneral = await fetch('http://app:9090/api/v1/park/' + params.parkId);
 
-    const avgLight = await fetch('http://app:9090/api/v1/parks/' + params.parkId + '/avgLight');
+    const avgLight = await fetch('http://app:9090/api/v1/park/' + params.parkId + '/avgLight');
 
-    const sensorCount = await fetch('http://app:9090/api/v1/parks/' + params.parkId + '/sensorCount');
+    const sensorCount = await fetch('http://app:9090/api/v1/park/' + params.parkId + '/sensorCount');
 
     const currDate = new Date().getTime()
 
-    const nwoccupancies = await fetch('http://app:9090/api/v1/parks/' + params.parkId + '/occupancies/' + (currDate - (86400000 * 7)) + '/' + currDate + '/' + 64);
-    const ndoccupancies = await fetch('http://app:9090/api/v1/parks/' + params.parkId + '/occupancies/' + (currDate - (86400000 * 1)) + '/' + currDate + '/' + 64);
-    const nmoccupancies = await fetch('http://app:9090/api/v1/parks/' + params.parkId + '/occupancies/' + (currDate - (86400000 * 30)) + '/' + currDate + '/' + 64);
+    const nwoccupancies = await fetch('http://app:9090/api/v1/park/' + params.parkId + '/occupancies/' + (currDate - (86400000 * 7)) + '/' + currDate + '/' + 64);
+    const ndoccupancies = await fetch('http://app:9090/api/v1/park/' + params.parkId + '/occupancies/' + (currDate - (86400000 * 1)) + '/' + currDate + '/' + 64);
+    const nmoccupancies = await fetch('http://app:9090/api/v1/park/' + params.parkId + '/occupancies/' + (currDate - (86400000 * 30)) + '/' + currDate + '/' + 64);
 
-    const ndairqualities = await fetch('http://app:9090/api/v1/parks/' + params.parkId + '/airqualities/' + (currDate - (86400000 * 1)) + '/' + currDate + '/' + 24);
+    const ndairqualities = await fetch('http://app:9090/api/v1/park/' + params.parkId + '/airqualities/' + (currDate - (86400000 * 1)) + '/' + currDate + '/' + 24);
 
-    const annualRevenue = await fetch('http://app:9090/api/v1/parks/' + params.parkId + '/revenue/annual');
-    const monthlyRevenue = await fetch('http://app:9090/api/v1/parks/' + params.parkId + '/revenue/monthly');
+    const annualRevenue = await fetch('http://app:9090/api/v1/park/' + params.parkId + '/revenue/annual');
+    const monthlyRevenue = await fetch('http://app:9090/api/v1/park/' + params.parkId + '/revenue/monthly');
 
     return {
         park: parkGeneral.json(),

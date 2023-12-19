@@ -48,24 +48,12 @@
 
         <!-- Nav Item - Utilities Collapse Menu -->
         <li class="nav-item">
-            <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities"
+            <!-- TODO: do this dynamic -->
+            <a class="nav-link collapsed" href="/parks/1" data-toggle="collapse" data-target="#collapseUtilities"
                 aria-expanded="true" aria-controls="collapseUtilities">
                 <i class="fas fa-fw fa-wrench"></i>
                 <span>Parks</span>
             </a>
-            <div id="collapseUtilities" class="collapse" aria-labelledby="headingUtilities"
-                data-parent="#accordionSidebar">
-                <div class="bg-white py-2 collapse-inner rounded">
-                    <a class="collapse-item" href="" data-toggle="modal" data-target="#addParkModal">Add Park</a>
-                    <h6 class="collapse-header">Parks:</h6>
-                    <a class="collapse-item" href="park1.html">Park 1</a>
-                    <a class="collapse-item" href="">Park 2</a>
-                    <a class="collapse-item" href="">Park 3</a>
-                    <a class="collapse-item" href="">Park 4</a>
-
-
-                </div>
-            </div>
         </li>
 
         <!-- Divider -->

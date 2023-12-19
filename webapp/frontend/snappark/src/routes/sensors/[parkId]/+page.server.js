@@ -16,8 +16,8 @@ export const actions = {
         console.log("FORM JSON: ");
         console.log(formJson);
         console.log("\n");
-        //TODO: call dynamic endpoint
-        const response = await fetch('http://localhost:9090/api/v1/park/1', {
+
+        const response = await fetch('http://localhost:9090/api/v1/park/' + params.userId, {
             method: 'POST',
             body: JSON.stringify(formJson),
             headers: {
@@ -31,3 +31,14 @@ export const actions = {
         return { success: true };
     }
 };
+
+/** @type {import('./$types').PageLoad} */
+export async function load({ params }) {
+
+    const uParks = await fetch('http://app:9090/api/v1/parks/' + params.userId);
+    const user = params.userId;
+    return {
+        parks: uParks.json(),
+        user: user,
+    };
+}

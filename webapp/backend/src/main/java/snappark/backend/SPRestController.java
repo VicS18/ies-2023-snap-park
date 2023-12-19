@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +26,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 @AllArgsConstructor
@@ -38,47 +38,42 @@ public class SPRestController {
     // Park operations
     //
     
-    @GetMapping("/parks/manager/{username}")
-    public ResponseEntity<List<Park>> getParksByUser(@PathVariable String username, @RequestParam(required = false) Long id, @RequestParam(required = false) String name){
-        // TODO: Handle case where username isn't provided or doesn't exist
-        System.out.println("==== GET /parks/manager/{username}");
-        List<Park> retPark = parkService.getParksByUsername(username);
-
-        System.out.println("==== GM_USERNAME: " + username);
-        System.out.println("==== GM_RETPARK: " + retPark);
-
-        if(id != null); // TODO: FILTER BY ID 
-        if(name != null); // TODO: FILTER BY NAME
-
+    @GetMapping("/parks/{userId}")
+    public ResponseEntity<List<Park>> getParksByUser(@PathVariable Long userId){
+        List<Park> retPark = parkService.getParksByUser(parkService.getUserById(userId).get());
         return new ResponseEntity<List<Park>>(retPark, HttpStatus.OK);
     } 
 
-    @PostMapping("/parks/manager/{username}")
-    public ResponseEntity<Park> postPark(@RequestBody Park park, @PathVariable String username){
-        System.out.println("==== POST /parks/manager/{username}");
-        System.out.println("==== PM_PARK: " + park);
-        System.out.println("==== PM_USERNAME: " + username);
-        Park savedPark = parkService.createPark(park, username);
-        System.out.println("==== PM_SAVED_PARK: " + savedPark);
-        // TODO: Handle case where username doesn't correspond to existing User (in Managers)
-
+    @PostMapping("/parks/{userId}")
+    public ResponseEntity<Park> postPark(@RequestBody Park park, @PathVariable Long userId){
+        Optional<User> user= parkService.getUserById(userId);
+        User nUser=new User();
+        if(user.isEmpty()){
+            nUser.setName("TestUser");
+            nUser.setPassword("1234");
+            parkService.createUser(nUser);
+        }
+        else
+            nUser=user.get();
+        Park savedPark = parkService.createPark(park,nUser);
+    
         return new ResponseEntity<Park>(savedPark, HttpStatus.CREATED);
     }
 
-    @GetMapping("/parks/{parkId}")
+    @GetMapping("/park/{parkId}")
     public ResponseEntity<Park> getPark(@PathVariable Long parkId){
         Park park = parkService.getParkById(parkId);
         return new ResponseEntity<Park>(park, HttpStatus.OK);
     }
 
-    @PutMapping("/parks/{parkId}")
+    @PutMapping("/park/{parkId}")
     public ResponseEntity<Park> putPark(@PathVariable Long parkId){
         // TODO: Handle Park not found
         Park updatedPark = parkService.updatePark(parkId);
         return new ResponseEntity<Park>(updatedPark, HttpStatus.OK);
     }
 
-    @DeleteMapping("/parks/{parkId}")
+    @DeleteMapping("/park/{parkId}")
     public HttpStatus deletePark(@PathVariable Long parkId){
         // TODO: Handle Park not found
         parkService.deletePark(parkId);
@@ -88,14 +83,18 @@ public class SPRestController {
     // 
     // Park-Event operations
     //
-
-    @PostMapping("/parks/{parkId}/sensors")
+    @GetMapping("/park/{parkId}/sensors")
+    public ResponseEntity<List<Sensor>> getSensor(@PathVariable Long parkId){
+        List<Sensor> sensors = parkService.getSensorsByPark(parkId);
+        return new ResponseEntity<List<Sensor>>(sensors, HttpStatus.OK);
+    }
+    @PostMapping("/park/{parkId}/sensors")
     public ResponseEntity<Sensor> postSensor(@RequestBody Sensor sensor, @PathVariable Long parkId){
         Sensor savedSensor = parkService.createSensor(sensor, parkId);
         return new ResponseEntity<Sensor>(savedSensor, HttpStatus.OK);
     }
 
-    @GetMapping("/parks/{parkId}/movements")
+    @GetMapping("/park/{parkId}/movements")
     public ResponseEntity<List<OccupancyHistory>> getMovements(@PathVariable Long parkId){
         // TODO: Handle Park not found
 
@@ -133,7 +132,7 @@ public class SPRestController {
     }
     }
 
-    @GetMapping("/parks/{parkId}/occupancies/{startDate}/{finishDate}/{numPoints}")
+    @GetMapping("/park/{parkId}/occupancies/{startDate}/{finishDate}/{numPoints}")
     public ResponseEntity<List<OccupancyRecord>> getOccupancies(@PathVariable Long parkId, @PathVariable Long startDate, @PathVariable Long finishDate, @PathVariable int numPoints){
         //start and finish date must be in timestamp
         List<OccupancyHistory> movements = parkService.getParkMovementsByDate(parkId,startDate,finishDate);
@@ -169,7 +168,7 @@ public class SPRestController {
         return new ResponseEntity<List<OccupancyRecord>>(points, HttpStatus.OK);
     }
 
-    @GetMapping("/parks/{parkId}/airqualities/{startDate}/{finishDate}/{numPoints}")
+    @GetMapping("/park/{parkId}/airqualities/{startDate}/{finishDate}/{numPoints}")
     public ResponseEntity<List<OccupancyRecord>> getAirQualities(@PathVariable Long parkId, @PathVariable Long startDate, @PathVariable Long finishDate, @PathVariable int numPoints){
         //start and finish date must be in timestamp
         ArrayList<OccupancyRecord> points= new ArrayList<OccupancyRecord>();
@@ -225,7 +224,7 @@ public class SPRestController {
     }
     // TODO: Consider using an @Entity for the return values of these two methods
 
-    @GetMapping("/parks/{parkId}/avgLight")
+    @GetMapping("/park/{parkId}/avgLight")
     public ResponseEntity<Map<String, Double>> getAvgLight(@PathVariable Long parkId) {
         // TODO: Handle park not found
 
@@ -241,7 +240,7 @@ public class SPRestController {
         return new ResponseEntity<Map<String, Double>>(avgLight, HttpStatus.OK);
     }
 
-    @GetMapping("/parks/{parkId}/sensorCount")
+    @GetMapping("/park/{parkId}/sensorCount")
     public ResponseEntity<Map<String, Integer>> getSensorCount(@PathVariable Long parkId) {
         Integer sensorCt = parkService.getSensorCount(parkId);
         System.out.println("SENSOR COUNT: " + sensorCt);
@@ -253,7 +252,7 @@ public class SPRestController {
         return ResponseEntity.ok(sensorCount);
     }
 
-    @GetMapping("/parks/{parkId}/revenue/annual")
+    @GetMapping("/park/{parkId}/revenue/annual")
     public ResponseEntity<Map<String, Double>> getAnnualRevenue(@PathVariable Long parkId) {
 
         Double anRev = parkService.getAnnualRevenue(parkId);
@@ -267,7 +266,7 @@ public class SPRestController {
         return ResponseEntity.ok(annualRevenue);
     }
 
-    @GetMapping("/parks/{parkId}/revenue/monthly")
+    @GetMapping("/park/{parkId}/revenue/monthly")
     public ResponseEntity<Map<String, Double>> getMonthlyRevenue(@PathVariable Long parkId) {
 
         Double monRev = parkService.getMonthlyRevenue(parkId);

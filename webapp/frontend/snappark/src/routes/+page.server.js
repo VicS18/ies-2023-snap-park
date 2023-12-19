@@ -10,7 +10,7 @@ export const actions = {
         const formJson = Object.fromEntries(formData.entries());
 
         // TODO: Migrate REST API address to the lib directory
-        const response = await fetch('http://app:9090/api/v1/parks/manager/John', {
+        const response = await fetch('http://app:9090/api/v1/parks/manager/1', {
             method: 'POST',
             body: JSON.stringify(formJson),
             headers: {
