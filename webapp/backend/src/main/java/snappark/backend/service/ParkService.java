@@ -25,7 +25,7 @@ public interface ParkService {
 
     Park getParkByName(String name);
 
-    Park createPark(Park park, String username);
+    Park createPark(Park park, User user);
 
     Park updatePark(Long parkId);
 
@@ -37,7 +37,7 @@ public interface ParkService {
 
     List<OccupancyHistory> getParkMovementsByDate(long parkId, long startDate, long endDate);
 
-    List<Park> getParksByUsername(String username);
+    List<Park> getParksByUser(User user);
 
     Sensor getSensorById(Long id);
 
@@ -52,7 +52,6 @@ public interface ParkService {
     User createUser(User user);
 
     Optional<User> getUserById(Long id);
-
 
     Occupancy createOccupancy(Occupancy occupancy);
    

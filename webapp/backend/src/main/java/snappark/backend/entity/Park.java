@@ -1,30 +1,19 @@
 package snappark.backend.entity;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(exclude = "managers")
-@ToString(exclude = "managers")
 @Entity
 public class Park {
     @Id
@@ -49,7 +38,4 @@ public class Park {
     @Column
     private int maxLotation;
 
-    @OneToMany(mappedBy = "park", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore
-    Set<Manager> managers = new HashSet<Manager>();
 }

@@ -137,8 +137,10 @@
 <!-- Page Heading -->
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
     <h1 class="h3 mb-0 text-gray-800">{data.park.name}</h1>
-    <button class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" data-toggle="modal" data-target="#addSensorModal"><i
-        class="fas fa-plus fa-sm text-white-50"></i> Add Sensor </button>
+    <a href="/park/1/sensors" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+        <i class="fa-solid fa-gear fa-sm text-white-50"></i> View Sensors
+    </a>
+    
     <a href="/" class="d-none d-sm-inline-block btn btn-sm btn-danger shadow-sm" data-toggle="modal" data-target="#remParkModal"><i
             class="fas fa-trash fa-sm text-white-50"></i> Remove Park </a>
     

@@ -1,11 +1,11 @@
 package snappark.backend.service;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -98,14 +98,13 @@ public class ParkServiceImpl implements ParkService {
         return foundPark.isPresent() ? foundPark.get() : null;    
     }
 
-    public Park createPark(Park park, String username){        
-        // TODO: Deal with situation where provided userId doesn't have a corresponding User
+    public Park createPark(Park park, User user){        
         
         Park savedPark = parkRepository.save(park);
 
-        User user = userRepository.findUserByName(username);
-
-        Manager manager = new Manager(user, savedPark);
+        Manager manager = new Manager();
+        manager.setUser(user);
+        manager.setPark(savedPark);
 
         Manager savedManager = managerRepository.save(manager);
         
@@ -149,15 +148,14 @@ public class ParkServiceImpl implements ParkService {
     // Manager entity operations
     //
 
-    public List<Park> getParksByUsername(String username){
-        List<Manager> managers = managerRepository.findByUserName(username);
-        System.out.println("==== D_PM_MANAGERS: " + managerRepository.findByUserName(username));
-
+    public List<Park> getParksByUser(User user){
+        List<Manager> managers = managerRepository.findByUser(user);
+        List<Park> parks=new ArrayList<Park>();
         for(Manager m : managers)
         {
-            System.out.println("==== D_PM_PARK: " + m.getPark() + "; USER: " + m.getUser());
+            parks.add(m.getPark());
         }
-        return managers.stream().map(Manager::getPark).collect(Collectors.toList());
+        return parks;
     }
 
     public OccupancyHistory createParkMovement(OccupancyHistory movement){
